@@ -1,0 +1,363 @@
+/* =============================================
+   login.css — Estilos de la página de login
+   Departamento de Bienestar Estudiantil — ISTPET
+   Paleta: azul marino #1e2a6e + dorado #c9a227
+   ============================================= */
+
+/* Importa la fuente Inter desde Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+/* ---- Reset base ---- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Variables de color institucionales */
+:root {
+    --azul-marino:  #1e2a6e;
+    --azul-oscuro:  #151d52;
+    --azul-medio:   #253387;
+    --dorado:       #c9a227;
+    --dorado-claro: #e2b93b;
+    --blanco:       #ffffff;
+    --fondo-input:  rgba(255,255,255,0.08);
+    --borde-input:  rgba(255,255,255,0.2);
+    --error-color:  #ff6b6b;
+    --radio:        12px;
+    --transicion:   all 0.3s ease;
+}
+
+html, body {
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden; /* Evita scroll en la página de login */
+}
+
+/* =============================================
+   LAYOUT PRINCIPAL — dos columnas
+   Izquierda: panel ilustrativo (azul marino)
+   Derecha: formulario de login (blanco/claro)
+   ============================================= */
+.contenedor-login {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+    height: 100vh;
+    width: 100%;
+}
+
+/* =============================================
+   PANEL IZQUIERDO — decorativo institucional
+   ============================================= */
+.panel-izquierdo {
+    background: linear-gradient(145deg, var(--azul-oscuro) 0%, var(--azul-marino) 50%, var(--azul-medio) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Círculo decorativo superior derecho */
+.panel-izquierdo::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(201, 162, 39, 0.1);
+    pointer-events: none;
+}
+
+/* Círculo decorativo inferior izquierdo */
+.panel-izquierdo::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -60px;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    pointer-events: none;
+}
+
+/* Escudo/logo SVG del instituto */
+.panel-izquierdo__escudo {
+    width: 90px;
+    height: 100px;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 1;
+    /* Animación suave de entrada */
+    animation: aparecerDesdeAbajo 0.6s ease forwards;
+}
+
+/* Nombre del instituto en dos líneas */
+.panel-izquierdo__nombre {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    animation: aparecerDesdeAbajo 0.7s ease forwards;
+}
+
+.panel-izquierdo__nombre h1 {
+    color: var(--dorado);
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.panel-izquierdo__nombre p {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.85rem;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+/* Línea separadora dorada */
+.panel-izquierdo__divisor {
+    width: 50px;
+    height: 3px;
+    background: var(--dorado);
+    border-radius: 2px;
+    margin: 24px auto;
+    position: relative;
+    z-index: 1;
+    animation: aparecerDesdeAbajo 0.8s ease forwards;
+}
+
+/* Texto del departamento */
+.panel-izquierdo__departamento {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    animation: aparecerDesdeAbajo 0.9s ease forwards;
+}
+
+.panel-izquierdo__departamento span {
+    display: block;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.panel-izquierdo__departamento h2 {
+    color: var(--blanco);
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+/* =============================================
+   PANEL DERECHO — formulario de login
+   ============================================= */
+.panel-derecho {
+    background-color: var(--blanco);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 60px;
+    position: relative;
+}
+
+/* ---- Contenedor del formulario ---- */
+.formulario-login {
+    width: 100%;
+    max-width: 380px;
+    animation: aparecerDesdeAbajo 0.5s ease forwards;
+}
+
+/* Encabezado del formulario */
+.formulario-login__encabezado {
+    margin-bottom: 36px;
+}
+
+.formulario-login__encabezado h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--azul-marino);
+    margin-bottom: 6px;
+}
+
+.formulario-login__encabezado p {
+    color: #8892a4;
+    font-size: 0.88rem;
+    font-weight: 400;
+}
+
+/* ---- Grupo de campo (label + input) ---- */
+.campo-grupo {
+    margin-bottom: 20px;
+}
+
+/* Etiqueta del campo */
+.campo-grupo label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--azul-marino);
+    margin-bottom: 8px;
+    letter-spacing: 0.3px;
+}
+
+/* Input base */
+.campo-grupo input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 2px solid #e1e5ee;
+    border-radius: var(--radio);
+    font-size: 0.92rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--azul-marino);
+    background-color: #f8f9fc;
+    transition: var(--transicion);
+    outline: none;
+}
+
+/* Estado activo del input */
+.campo-grupo input:focus {
+    border-color: var(--azul-marino);
+    background-color: var(--blanco);
+    box-shadow: 0 0 0 4px rgba(30, 42, 110, 0.08);
+}
+
+/* Contenedor del input de contraseña con botón de ojo */
+.campo-contrasena {
+    position: relative;
+}
+
+.campo-contrasena input {
+    padding-right: 48px; /* Espacio para el botón del ojo */
+}
+
+/* Botón para mostrar/ocultar contraseña */
+.btn-ojo {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: #8892a4;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.btn-ojo:hover {
+    color: var(--azul-marino);
+}
+
+/* ---- Botón de ingresar ---- */
+.btn-ingresar {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--azul-marino), var(--azul-medio));
+    color: var(--blanco);
+    border: none;
+    border-radius: var(--radio);
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: var(--transicion);
+    margin-top: 8px;
+    letter-spacing: 0.3px;
+}
+
+.btn-ingresar:hover {
+    background: linear-gradient(135deg, var(--azul-oscuro), var(--azul-marino));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 42, 110, 0.35);
+}
+
+/* Estado de carga del botón */
+.btn-ingresar:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ---- Mensaje de error ---- */
+.mensaje-error {
+    background-color: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #c0392b;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 16px;
+    display: none; /* Oculto por defecto, se muestra con JS */
+    align-items: center;
+    gap: 8px;
+}
+
+.mensaje-error.visible {
+    display: flex; /* Se muestra con la clase 'visible' */
+}
+
+/* ---- Link de regreso al inicio ---- */
+.link-inicio {
+    display: block;
+    text-align: center;
+    margin-top: 28px;
+    color: #8892a4;
+    font-size: 0.82rem;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.link-inicio:hover {
+    color: var(--azul-marino);
+}
+
+/* =============================================
+   ANIMACIONES
+   ============================================= */
+@keyframes aparecerDesdeAbajo {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =============================================
+   DISEÑO RESPONSIVO — pantallas pequeñas
+   ============================================= */
+@media (max-width: 820px) {
+    /* En móvil solo se muestra el panel derecho */
+    .contenedor-login {
+        grid-template-columns: 1fr;
+    }
+
+    /* Oculta el panel decorativo izquierdo en móvil */
+    .panel-izquierdo {
+        display: none;
+    }
+
+    /* El panel del formulario ocupa toda la pantalla */
+    .panel-derecho {
+        padding: 40px 28px;
+    }
+
+    html, body {
+        overflow: auto; /* Permite scroll en móvil */
+    }
+}

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- =============================================
+         login.html — Página de inicio de sesión
+         Departamento de Bienestar Estudiantil — ISTPET
+         ============================================= -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Inicio de sesión — Bienestar Estudiantil ISTPET">
+    <title>Ingresar — Bienestar Estudiantil</title>
+
+    <!-- Hoja de estilos específica para el login -->
+    <link rel="stylesheet" href="estilos/login.css">
+</head>
+<body>
+
+    <!-- =============================================
+         CONTENEDOR PRINCIPAL — layout de dos columnas
+         - Panel izquierdo: decorativo institucional
+         - Panel derecho: formulario de login
+         ============================================= -->
+    <div class="contenedor-login">
+
+        <!-- ==========================================
+             PANEL IZQUIERDO — identidad institucional
+             ========================================== -->
+        <div class="panel-izquierdo" aria-hidden="true">
+
+            <!-- Escudo del instituto como SVG incrustado -->
+            <svg class="panel-izquierdo__escudo"
+                 viewBox="0 0 80 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Forma exterior del escudo -->
+                <path d="M40 3 L77 18 L77 48 C77 68 60 83 40 87 C20 83 3 68 3 48 L3 18 Z"
+                      fill="#c9a227" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+                <!-- Forma interior del escudo (efecto bicolor) -->
+                <path d="M40 12 L68 24 L68 46 C68 62 55 74 40 77 C25 74 12 62 12 46 L12 24 Z"
+                      fill="#1e2a6e"/>
+                <!-- Cruz horizontal -->
+                <line x1="22" y1="46" x2="58" y2="46"
+                      stroke="#c9a227" stroke-width="3.5" stroke-linecap="round"/>
+                <!-- Cruz vertical -->
+                <line x1="40" y1="28" x2="40" y2="64"
+                      stroke="#c9a227" stroke-width="3.5" stroke-linecap="round"/>
+            </svg>
+
+            <!-- Nombre del instituto -->
+            <div class="panel-izquierdo__nombre">
+                <h1>ISTPET</h1>
+                <p>Instituto Superior<br>Tecnológico</p>
+            </div>
+
+            <!-- Línea divisora dorada -->
+            <div class="panel-izquierdo__divisor"></div>
+
+            <!-- Nombre del departamento -->
+            <div class="panel-izquierdo__departamento">
+                <span>Departamento de</span>
+                <h2>Bienestar Estudiantil</h2>
+            </div>
+
+        </div>
+
+        <!-- ==========================================
+             PANEL DERECHO — formulario de autenticación
+             ========================================== -->
+        <div class="panel-derecho">
+
+            <!-- Contenedor del formulario con ancho máximo controlado -->
+            <div class="formulario-login" role="main">
+
+                <!-- Encabezado del formulario -->
+                <div class="formulario-login__encabezado">
+                    <h2>Bienvenido</h2>
+                    <p>Ingresa tus credenciales para acceder al sistema</p>
+                </div>
+
+                <!-- ======================================
+                     FORMULARIO DE LOGIN
+                     Los datos se envían por JS (fetch API)
+                     para mostrar errores sin recargar la página
+                     ====================================== -->
+                <form id="formulario-autenticacion" novalidate>
+
+                    <!-- Campo: Correo institucional -->
+                    <div class="campo-grupo">
+                        <label for="campo-correo">Correo institucional</label>
+                        <input
+                            type="email"
+                            id="campo-correo"
+                            name="correo"
+                            autocomplete="username"
+                            required
+                            spellcheck="false"
+                        >
+                    </div>
+
+                    <!-- Campo: Contraseña con botón para mostrar/ocultar -->
+                    <div class="campo-grupo">
+                        <label for="campo-contrasena">Contraseña</label>
+                        <div class="campo-contrasena">
+                            <input
+                                type="password"
+                                id="campo-contrasena"
+                                name="contrasena"
+                                autocomplete="current-password"
+                                required
+                            >
+                            <!-- Botón ojo: muestra u oculta la contraseña -->
+                            <button
+                                type="button"
+                                class="btn-ojo"
+                                id="btn-mostrar-contrasena"
+                                aria-label="Mostrar u ocultar contraseña"
+                            >
+                                <!-- Ícono SVG de ojo (visible por defecto) -->
+                                <svg id="icono-ojo-abierto"
+                                     width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <!-- Ícono SVG de ojo tachado (oculto por defecto) -->
+                                <svg id="icono-ojo-cerrado"
+                                     width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2"
+                                     style="display:none;" aria-hidden="true">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                                    <line x1="1" y1="1" x2="23" y2="23"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Botón de ingreso -->
+                    <button
+                        type="submit"
+                        class="btn-ingresar"
+                        id="btn-ingresar"
+                    >
+                        Ingresar
+                    </button>
+
+                    <!-- Mensaje de error (oculto por defecto, JS lo activa) -->
+                    <div class="mensaje-error" id="mensaje-error" role="alert">
+                        <!-- Ícono de alerta -->
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="8" x2="12" y2="12"/>
+                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <!-- El texto del error se escribe con JS -->
+                        <span id="texto-error"></span>
+                    </div>
+
+                </form>
+
+                <!-- Enlace para volver a la página de inicio -->
+                <a href="/" class="link-inicio">← Volver al inicio</a>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- =============================================
+         SCRIPT — Lógica del formulario de login
+         Envía las credenciales por AJAX (fetch API)
+         sin recargar la página
+         ============================================= -->
+    <script>
+        // =============================================
+        // Referencias a los elementos del DOM
+        // =============================================
+        const formulario       = document.getElementById('formulario-autenticacion');
+        const campoCorrro      = document.getElementById('campo-correo');
+        const campoContrasena  = document.getElementById('campo-contrasena');
+        const btnIngresar      = document.getElementById('btn-ingresar');
+        const mensajeError     = document.getElementById('mensaje-error');
+        const textoError       = document.getElementById('texto-error');
+        const btnMostrar       = document.getElementById('btn-mostrar-contrasena');
+        const iconoOjoAbierto  = document.getElementById('icono-ojo-abierto');
+        const iconoOjoCerrado  = document.getElementById('icono-ojo-cerrado');
+
+        // =============================================
+        // Función: mostrarError
+        // Muestra el div de error con el mensaje recibido
+        // =============================================
+        function mostrarError(mensaje) {
+            textoError.textContent = mensaje;
+            mensajeError.classList.add('visible');
+        }
+
+        // =============================================
+        // Función: ocultarError
+        // Oculta el div de error
+        // =============================================
+        function ocultarError() {
+            mensajeError.classList.remove('visible');
+            textoError.textContent = '';
+        }
+
+        // =============================================
+        // Toggle: mostrar/ocultar contraseña al hacer
+        // clic en el ícono del ojo
+        // =============================================
+        btnMostrar.addEventListener('click', () => {
+            if (campoContrasena.type === 'password') {
+                // Muestra la contraseña
+                campoContrasena.type = 'text';
+                iconoOjoAbierto.style.display = 'none';
+                iconoOjoCerrado.style.display = 'block';
+            } else {
+                // Vuelve a ocultar la contraseña
+                campoContrasena.type = 'password';
+                iconoOjoAbierto.style.display = 'block';
+                iconoOjoCerrado.style.display = 'none';
+            }
+        });
+
+        // Oculta el error cuando el usuario empieza a escribir
+        campoCorrro.addEventListener('input', ocultarError);
+        campoContrasena.addEventListener('input', ocultarError);
+
+        // =============================================
+        // Maneja el envío del formulario
+        // Envía los datos al backend por fetch (AJAX)
+        // para evitar recargar la página al fallar
+        // =============================================
+        formulario.addEventListener('submit', async (evento) => {
+            // Previene el comportamiento por defecto del formulario
+            evento.preventDefault();
+            ocultarError();
+
+            // Obtiene los valores de los campos
+            const correo    = campoCorrro.value.trim();
+            const contrasena = campoContrasena.value;
+
+            // Validación en el lado del cliente
+            if (!correo || !contrasena) {
+                mostrarError('Por favor completa todos los campos');
+                return;
+            }
+
+            // Cambia el botón a estado de carga
+            btnIngresar.textContent = 'Verificando...';
+            btnIngresar.disabled = true;
+
+            try {
+                // Envía la solicitud POST con las credenciales en formato JSON
+                const respuesta = await fetch('/bienestar/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ correo, contrasena })
+                });
+
+                // Convierte la respuesta del servidor a JSON
+                const datos = await respuesta.json();
+
+                if (datos.exito) {
+                    // ✅ Credenciales correctas: redirige al panel
+                    btnIngresar.textContent = '¡Acceso concedido!';
+                    window.location.href = datos.redirigir;
+                } else {
+                    // ❌ Error: muestra el mensaje devuelto por el servidor
+                    mostrarError(datos.mensaje || 'Error al iniciar sesión');
+                    btnIngresar.textContent = 'Ingresar';
+                    btnIngresar.disabled = false;
+                }
+
+            } catch (errorRed) {
+                // Error de red (servidor caído, sin conexión, etc.)
+                mostrarError('No se pudo conectar con el servidor. Intenta nuevamente.');
+                btnIngresar.textContent = 'Ingresar';
+                btnIngresar.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>

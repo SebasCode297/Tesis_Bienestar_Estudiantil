@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- =============================================
+         index.html — Panel de Bienestar Estudiantil
+         3 vistas: Formatos / Estudiantes / Reportes
+         Navegación por sidebar sin recargar la página
+         ============================================= -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel — Bienestar Estudiantil</title>
+    <link rel="stylesheet" href="estilos/panel.css">
+</head>
+<body>
+
+    <!-- =============================================
+         SIDEBAR (Menú lateral izquierdo)
+         ============================================= -->
+    <aside class="sidebar">
+        <div class="sidebar__marca">
+            <h2>ISTPET</h2>
+            <span>Bienestar Estudiantil</span>
+        </div>
+        
+        <ul class="sidebar__menu">
+            <!-- Cada <a> llama a cambiarVista() para mostrar/ocultar secciones -->
+            <li><a href="#" class="activo" onclick="cambiarVista('formatos', this)">Formatos del Sistema</a></li>
+            <li><a href="#" onclick="cambiarVista('estudiantes', this)">Estudiantes</a></li>
+            <li><a href="#" onclick="cambiarVista('reportes', this)">Reportes</a></li>
+        </ul>
+
+        <div class="sidebar__usuario">
+            <span id="txt-correo">Cargando...</span>
+            <br>
+            <a href="/bienestar/cerrar-sesion">Cerrar Sesión</a>
+        </div>
+    </aside>
+
+    <!-- =============================================
+         CONTENIDO PRINCIPAL
+         ============================================= -->
+    <main class="contenido">
+        <header class="header-top">
+            <h1 id="titulo-pagina">Gestión de Formatos</h1>
+        </header>
+
+        <div class="scroll-area">
+
+            <!-- =============================================
+                 VISTA 1: FORMATOS DEL SISTEMA
+                 ============================================= -->
+            <div id="vista-formatos">
+                <!-- MÓDULO BECA -->
+                <section class="modulo" id="modulo-beca">
+                    <div class="modulo__header"><h2>Módulo: Formatos de Beca</h2></div>
+                    <div class="modulo__body">
+                        <table class="tabla-formatos">
+                            <thead><tr><th>Nombre del Formato</th><th>Estado</th><th>Acción</th></tr></thead>
+                            <tbody id="tabla-beca"><tr><td colspan="3" style="text-align:center;">Cargando...</td></tr></tbody>
+                        </table>
+                    </div>
+                </section>
+                <!-- MÓDULO SEGUIMIENTO -->
+                <section class="modulo" id="modulo-seguimiento">
+                    <div class="modulo__header"><h2>Módulo: Seguimiento y Acompañamiento Estudiantil</h2></div>
+                    <div class="modulo__body">
+                        <table class="tabla-formatos">
+                            <thead><tr><th>Nombre del Formato</th><th>Estado</th><th>Acción</th></tr></thead>
+                            <tbody id="tabla-seguimiento"></tbody>
+                        </table>
+                    </div>
+                </section>
+                <!-- VISOR DE DOCUMENTO (oculto) -->
+                <section class="modulo visor" id="visor-documento" style="display:none;">
+                    <div class="modulo__header visor__header">
+                        <button class="btn-volver" onclick="cerrarVisor()">← Volver a formatos</button>
+                        <h2 id="visor-titulo">Documento</h2>
+                    </div>
+                    <div class="modulo__body visor__body">
+                        <div id="visor-cargando" style="text-align:center;padding:40px;color:#888;">Cargando documento...</div>
+                        <div id="visor-contenido" class="visor__contenido"></div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- =============================================
+                 VISTA 2: ESTUDIANTES
+                 ============================================= -->
+            <div id="vista-estudiantes" style="display:none;">
+
+                <!-- Formulario de registro de estudiante -->
+                <section class="modulo">
+                    <div class="modulo__header"><h2>Registrar Estudiante</h2></div>
+                    <div class="modulo__body">
+                        <form id="form-estudiante" class="form-grid" onsubmit="registrarEstudiante(event)">
+                            <div class="campo">
+                                <label for="est-cedula">Cédula *</label>
+                                <input type="text" id="est-cedula" required maxlength="15">
+                            </div>
+                            <div class="campo">
+                                <label for="est-nombre">Nombre Completo *</label>
+                                <input type="text" id="est-nombre" required>
+                            </div>
+                            <div class="campo">
+                                <label for="est-carrera">Carrera *</label>
+                                <input type="text" id="est-carrera" required>
+                            </div>
+                            <div class="campo">
+                                <label for="est-periodo">Periodo Académico *</label>
+                                <input type="text" id="est-periodo" required>
+                            </div>
+                            <div class="campo">
+                                <label for="est-correo">Correo Electrónico</label>
+                                <input type="email" id="est-correo">
+                            </div>
+                            <div class="campo">
+                                <label for="est-telefono">Teléfono</label>
+                                <input type="text" id="est-telefono" maxlength="20">
+                            </div>
+                            <div class="campo campo--full">
+                                <button type="submit" class="btn btn--primario">Registrar Estudiante</button>
+                                <span id="msg-registro" class="msg-estado"></span>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Barra de búsqueda -->
+                <section class="modulo">
+                    <div class="modulo__header"><h2>Lista de Estudiantes</h2></div>
+                    <div class="modulo__body">
+                        <div class="barra-busqueda">
+                            <input type="text" id="input-busqueda" class="input-buscar" oninput="buscarEstudiantes()">
+                            <span class="buscar-hint">Buscar por nombre o cédula</span>
+                        </div>
+                        <table class="tabla-formatos" id="tabla-estudiantes-container">
+                            <thead>
+                                <tr>
+                                    <th>Cédula</th><th>Nombre</th><th>Carrera</th>
+                                    <th>Periodo</th><th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-estudiantes">
+                                <tr><td colspan="5" style="text-align:center;">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Panel de detalle / historial de un estudiante (oculto) -->
+                <section class="modulo" id="detalle-estudiante" style="display:none;">
+                    <div class="modulo__header visor__header">
+                        <button class="btn-volver" onclick="cerrarDetalle()">← Volver a lista</button>
+                        <h2 id="detalle-nombre">Estudiante</h2>
+                    </div>
+                    <div class="modulo__body">
+                        <!-- Info del estudiante -->
+                        <div class="info-est" id="info-estudiante"></div>
+
+                        <!-- Vincular formato -->
+                        <div class="vincular-box">
+                            <h3>Vincular Formato</h3>
+                            <div class="vincular-form">
+                                <select id="select-formato" class="input-buscar"></select>
+                                <input type="text" id="input-observacion" class="input-buscar" style="flex:1;">
+                                <span class="buscar-hint" style="position:static;">Observación (opcional)</span>
+                                <button class="btn btn--primario" onclick="vincularFormato()">Vincular</button>
+                            </div>
+                        </div>
+
+                        <!-- Formatos vinculados -->
+                        <h3 style="margin:20px 0 10px;">Formatos Vinculados</h3>
+                        <table class="tabla-formatos">
+                            <thead><tr><th>Formato</th><th>Módulo</th><th>Observación</th><th>Fecha</th><th>Acción</th></tr></thead>
+                            <tbody id="tabla-formatos-est"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- =============================================
+                 VISTA 3: REPORTES
+                 ============================================= -->
+            <div id="vista-reportes" style="display:none;">
+
+                <!-- Tarjetas de estadísticas -->
+                <div class="stats-grid" id="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-valor" id="stat-estudiantes">0</span>
+                        <span class="stat-label">Estudiantes Registrados</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-valor" id="stat-beca">0</span>
+                        <span class="stat-label">En Proceso de Beca</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-valor" id="stat-seguimiento">0</span>
+                        <span class="stat-label">En Seguimiento</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-valor" id="stat-asignaciones">0</span>
+                        <span class="stat-label">Formatos Asignados</span>
+                    </div>
+                </div>
+
+                <!-- Resumen de formatos -->
+                <section class="modulo">
+                    <div class="modulo__header"><h2>Resumen de Formatos del Sistema</h2></div>
+                    <div class="modulo__body">
+                        <div class="resumen-formatos" id="resumen-formatos">
+                            <p>Cargando...</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Librería mammoth.js — convierte Word (.docx) a HTML -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+    <!-- =============================================
+         SCRIPTS: Toda la lógica de las 3 vistas
+         ============================================= -->
+    <script>
+
+        // Carga la información del usuario al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarSesion();
+            cargarFormatos();
+        });
+
+        async function cargarSesion() {
+            try {
+                const resp = await fetch('/bienestar/api/sesion');
+                const d = await resp.json();
+                if (d.exito && d.datos.correo) {
+                    // Extrae la parte antes del @ (ej: bienestar.estudiantil)
+                    const nombreUsuario = d.datos.correo.split('@')[0];
+                    document.getElementById('txt-correo').textContent = nombreUsuario;
+                } else {
+                    document.getElementById('txt-correo').textContent = 'Usuario';
+                }
+            } catch (e) {
+                console.error('Error al cargar sesión:', e);
+                document.getElementById('txt-correo').textContent = 'Usuario';
+            }
+        }
+
+        // =============================================
+        // NAVEGACIÓN POR SIDEBAR
+        // Cambia entre las 3 vistas sin recargar página
+        // =============================================
+        const titulos = {
+            formatos: 'Gestión de Formatos',
+            estudiantes: 'Gestión de Estudiantes',
+            reportes: 'Reportes y Estadísticas'
+        };
+
+        function cambiarVista(vista, elemento) {
+            // Oculta todas las vistas
+            document.getElementById('vista-formatos').style.display = 'none';
+            document.getElementById('vista-estudiantes').style.display = 'none';
+            document.getElementById('vista-reportes').style.display = 'none';
+
+            // Muestra la vista seleccionada
+            document.getElementById('vista-' + vista).style.display = 'block';
+            document.getElementById('titulo-pagina').textContent = titulos[vista];
+
+            // Actualiza el sidebar (clase activo)
+            document.querySelectorAll('.sidebar__menu a').forEach(a => a.classList.remove('activo'));
+            elemento.classList.add('activo');
+
+            // Carga los datos de la vista seleccionada
+            if (vista === 'formatos') cargarFormatos();
+            if (vista === 'estudiantes') cargarEstudiantes();
+            if (vista === 'reportes') cargarReportes();
+        }
+
+        // =============================================
+        // VISTA 1: FORMATOS
+        // =============================================
+
+        async function cargarFormatos() {
+            try {
+                const resp = await fetch('/bienestar/api/formatos');
+                if (resp.redirected) { window.location.href = resp.url; return; }
+                const datos = await resp.json();
+                if (datos.exito) {
+                    renderizarTabla('tabla-beca', datos.datos.beca);
+                    renderizarTabla('tabla-seguimiento', datos.datos.seguimiento);
+                }
+            } catch (e) { console.error('Error al cargar formatos:', e); }
+        }
+
+        function renderizarTabla(idTabla, formatos) {
+            const tbody = document.getElementById(idTabla);
+            tbody.innerHTML = '';
+            if (!formatos.length) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Sin formatos.</td></tr>';
+                return;
+            }
+            formatos.forEach(f => {
+                const tr = document.createElement('tr');
+                const tieneArchivo = !!f.archivo_ruta;
+
+                // Columna nombre (clickeable si tiene archivo)
+                const tdN = document.createElement('td');
+                tdN.className = 'formato-nombre';
+                if (tieneArchivo) {
+                    const a = document.createElement('a');
+                    a.href = '#'; a.textContent = f.nombre;
+                    a.style.cssText = 'color:var(--azul-marino);text-decoration:underline;cursor:pointer;';
+                    a.addEventListener('click', e => { e.preventDefault(); abrirVisor(f.id, f.nombre); });
+                    tdN.appendChild(a);
+                } else { tdN.textContent = f.nombre; }
+
+                // Columna estado
+                const tdE = document.createElement('td');
+                tdE.innerHTML = tieneArchivo
+                    ? '<span class="estado estado--subido">● Documento Cargado</span>'
+                    : '<span class="estado estado--pendiente">○ Pendiente</span>';
+
+                // Columna acciones
+                const tdA = document.createElement('td');
+                tdA.className = 'acciones';
+                let descarga = tieneArchivo ? `<a href="/bienestar/api/formatos/${f.id}/descargar" class="btn btn--descarga" target="_blank">Descargar</a>` : '';
+                tdA.innerHTML = `
+                    <form class="form-subida" onsubmit="event.preventDefault()">
+                        <label class="btn btn--outline" for="file-${f.id}">${tieneArchivo ? 'Reemplazar' : 'Seleccionar Archivo'}</label>
+                        <input type="file" id="file-${f.id}" class="input-file" accept=".pdf,.doc,.docx" onchange="subirArchivo(${f.id}, this)">
+                        <span id="progreso-${f.id}" class="nombre-archivo-sel"></span>
+                        ${descarga}
+                    </form>`;
+                tr.appendChild(tdN); tr.appendChild(tdE); tr.appendChild(tdA);
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function subirArchivo(id, input) {
+            const file = input.files[0]; if (!file) return;
+            const span = document.getElementById(`progreso-${id}`);
+            span.textContent = 'Subiendo...';
+            const fd = new FormData(); fd.append('documento', file);
+            try {
+                const r = await fetch(`/bienestar/api/formatos/${id}/subir`, { method:'POST', body:fd });
+                const d = await r.json();
+                if (d.exito) { span.style.color='var(--exito)'; span.textContent='¡Cargado!'; setTimeout(cargarFormatos,1000); }
+                else { span.style.color='#c0392b'; span.textContent='Error.'; }
+            } catch(e) { span.style.color='#c0392b'; span.textContent='Error de red.'; }
+            input.value = '';
+        }
+
+        // Visor de documentos Word → HTML
+        async function abrirVisor(id, nombre) {
+            document.getElementById('modulo-beca').style.display = 'none';
+            document.getElementById('modulo-seguimiento').style.display = 'none';
+            const visor = document.getElementById('visor-documento');
+            visor.style.display = 'block';
+            document.getElementById('visor-titulo').textContent = nombre;
+            document.getElementById('visor-cargando').style.display = 'block';
+            document.getElementById('visor-contenido').innerHTML = '';
+            try {
+                const blob = await (await fetch(`/bienestar/api/formatos/${id}/ver`)).blob();
+                const ab = await blob.arrayBuffer();
+                const res = await mammoth.convertToHtml({ arrayBuffer: ab });
+                document.getElementById('visor-cargando').style.display = 'none';
+                document.getElementById('visor-contenido').innerHTML = res.value;
+            } catch(e) {
+                document.getElementById('visor-cargando').style.display = 'none';
+                document.getElementById('visor-contenido').innerHTML = '<p style="color:#c0392b;text-align:center;">No se pudo cargar. Verifica que sea .docx</p>';
+            }
+        }
+        function cerrarVisor() {
+            document.getElementById('visor-documento').style.display = 'none';
+            document.getElementById('modulo-beca').style.display = 'block';
+            document.getElementById('modulo-seguimiento').style.display = 'block';
+        }
+
+        // =============================================
+        // VISTA 2: ESTUDIANTES
+        // =============================================
+        let estudianteActualId = null; // ID del estudiante cuyo detalle se está viendo
+
+        async function cargarEstudiantes() {
+            try {
+                const r = await fetch('/bienestar/api/estudiantes');
+                const d = await r.json();
+                if (d.exito) renderizarEstudiantes(d.datos);
+            } catch(e) { console.error('Error:', e); }
+        }
+
+        function renderizarEstudiantes(lista) {
+            const tbody = document.getElementById('tabla-estudiantes');
+            tbody.innerHTML = '';
+            if (!lista.length) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay estudiantes registrados.</td></tr>';
+                return;
+            }
+            lista.forEach(e => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${e.cedula}</td>
+                    <td class="formato-nombre">${e.nombre}</td>
+                    <td>${e.carrera}</td>
+                    <td>${e.periodo}</td>
+                    <td><button class="btn btn--outline" onclick="verDetalle(${e.id})">Ver Historial</button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Búsqueda en tiempo real
+        let timerBusqueda;
+        function buscarEstudiantes() {
+            clearTimeout(timerBusqueda);
+            timerBusqueda = setTimeout(async () => {
+                const texto = document.getElementById('input-busqueda').value;
+                const r = await fetch(`/bienestar/api/estudiantes?buscar=${encodeURIComponent(texto)}`);
+                const d = await r.json();
+                if (d.exito) renderizarEstudiantes(d.datos);
+            }, 300);
+        }
+
+        // Registrar estudiante
+        async function registrarEstudiante(e) {
+            e.preventDefault();
+            const msg = document.getElementById('msg-registro');
+            const datos = {
+                cedula:   document.getElementById('est-cedula').value,
+                nombre:   document.getElementById('est-nombre').value,
+                carrera:  document.getElementById('est-carrera').value,
+                periodo:  document.getElementById('est-periodo').value,
+                correo:   document.getElementById('est-correo').value,
+                telefono: document.getElementById('est-telefono').value
+            };
+            try {
+                const r = await fetch('/bienestar/api/estudiantes', {
+                    method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(datos)
+                });
+                const d = await r.json();
+                if (d.exito) {
+                    msg.style.color = 'var(--exito)'; msg.textContent = '¡Estudiante registrado!';
+                    document.getElementById('form-estudiante').reset();
+                    cargarEstudiantes();
+                    setTimeout(() => msg.textContent = '', 3000);
+                } else { msg.style.color = '#c0392b'; msg.textContent = d.mensaje; }
+            } catch(err) { msg.style.color = '#c0392b'; msg.textContent = 'Error de red.'; }
+        }
+
+        // Ver detalle / historial de un estudiante
+        async function verDetalle(id) {
+            estudianteActualId = id;
+            try {
+                const r = await fetch(`/bienestar/api/estudiantes/${id}`);
+                const d = await r.json();
+                if (!d.exito) return;
+                const est = d.datos;
+
+                // Oculta la lista y muestra el detalle
+                document.getElementById('tabla-estudiantes-container').parentElement.parentElement.style.display = 'none';
+                document.getElementById('detalle-estudiante').style.display = 'block';
+                document.getElementById('detalle-nombre').textContent = est.nombre;
+
+                // Info del estudiante
+                document.getElementById('info-estudiante').innerHTML = `
+                    <div class="info-grid">
+                        <div><strong>Cédula:</strong> ${est.cedula}</div>
+                        <div><strong>Carrera:</strong> ${est.carrera}</div>
+                        <div><strong>Periodo:</strong> ${est.periodo}</div>
+                        <div><strong>Correo:</strong> ${est.correo || '—'}</div>
+                        <div><strong>Teléfono:</strong> ${est.telefono || '—'}</div>
+                    </div>`;
+
+                // Cargar select de formatos disponibles
+                const rf = await fetch('/bienestar/api/formatos');
+                const df = await rf.json();
+                const select = document.getElementById('select-formato');
+                select.innerHTML = '<option value="">— Seleccionar formato —</option>';
+                if (df.exito) {
+                    [...df.datos.beca, ...df.datos.seguimiento].forEach(f => {
+                        select.innerHTML += `<option value="${f.id}">${f.nombre}</option>`;
+                    });
+                }
+
+                // Renderizar formatos vinculados
+                renderizarFormatosEstudiante(est.formatos);
+            } catch(e) { console.error('Error:', e); }
+        }
+
+        function renderizarFormatosEstudiante(formatos) {
+            const tbody = document.getElementById('tabla-formatos-est');
+            tbody.innerHTML = '';
+            if (!formatos.length) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Sin formatos vinculados.</td></tr>';
+                return;
+            }
+            formatos.forEach(f => {
+                const fecha = new Date(f.asignado_en).toLocaleDateString('es-EC');
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="formato-nombre">${f.nombre}</td>
+                    <td><span class="estado ${f.modulo==='beca'?'estado--subido':'estado--pendiente'}">${f.modulo==='beca'?'Beca':'Seguimiento'}</span></td>
+                    <td>${f.observacion || '—'}</td>
+                    <td>${fecha}</td>
+                    <td><button class="btn btn--descarga" onclick="desvincularFormato(${f.asignacion_id})">Desvincular</button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Vincular formato al estudiante actual
+        async function vincularFormato() {
+            const formatoId = document.getElementById('select-formato').value;
+            const observacion = document.getElementById('input-observacion').value;
+            if (!formatoId) return alert('Selecciona un formato');
+            try {
+                const r = await fetch(`/bienestar/api/estudiantes/${estudianteActualId}/formatos`, {
+                    method:'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({ formatoId, observacion })
+                });
+                const d = await r.json();
+                if (d.exito) {
+                    document.getElementById('input-observacion').value = '';
+                    verDetalle(estudianteActualId); // Recargar detalle
+                }
+            } catch(e) { console.error('Error:', e); }
+        }
+
+        // Desvincular formato
+        async function desvincularFormato(asignacionId) {
+            if (!confirm('¿Desvincular este formato del estudiante?')) return;
+            try {
+                await fetch(`/bienestar/api/estudiantes/${estudianteActualId}/formatos/${asignacionId}`, { method:'DELETE' });
+                verDetalle(estudianteActualId);
+            } catch(e) { console.error('Error:', e); }
+        }
+
+        // Cerrar detalle y volver a la lista
+        function cerrarDetalle() {
+            document.getElementById('detalle-estudiante').style.display = 'none';
+            document.getElementById('tabla-estudiantes-container').parentElement.parentElement.style.display = 'block';
+        }
+
+        // =============================================
+        // VISTA 3: REPORTES
+        // =============================================
+        async function cargarReportes() {
+            try {
+                // Estadísticas generales
+                const re = await fetch('/bienestar/api/reportes/estadisticas');
+                const de = await re.json();
+                if (de.exito) {
+                    document.getElementById('stat-estudiantes').textContent = de.datos.totalEstudiantes;
+                    document.getElementById('stat-beca').textContent = de.datos.enBeca;
+                    document.getElementById('stat-seguimiento').textContent = de.datos.enSeguimiento;
+                    document.getElementById('stat-asignaciones').textContent = de.datos.totalAsignaciones;
+                }
+
+                // Resumen de formatos
+                const rf = await fetch('/bienestar/api/reportes/resumen');
+                const df = await rf.json();
+                if (df.exito) {
+                    const d = df.datos;
+                    document.getElementById('resumen-formatos').innerHTML = `
+                        <div class="resumen-barras">
+                            <div class="resumen-item">
+                                <span>Formatos Cargados</span>
+                                <div class="barra"><div class="barra-fill barra--exito" style="width:${(d.cargados/d.total)*100}%"></div></div>
+                                <strong>${d.cargados} / ${d.total}</strong>
+                            </div>
+                            <div class="resumen-item">
+                                <span>Formatos Pendientes</span>
+                                <div class="barra"><div class="barra-fill barra--pendiente" style="width:${(d.pendientes/d.total)*100}%"></div></div>
+                                <strong>${d.pendientes} / ${d.total}</strong>
+                            </div>
+                        </div>`;
+                }
+            } catch(e) { console.error('Error en reportes:', e); }
+        }
+
+    </script>
+</body>
+</html>
