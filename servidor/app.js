@@ -20,6 +20,9 @@ const pool    = require('./config/baseDatos');
 const app   = express();
 const PUERTO = process.env.PUERTO || 3000;
 
+// Configuración para Vercel: confiar en el proxy para manejar sesiones seguras en HTTPS
+app.set('trust proxy', 1);
+
 // =============================================
 // MIDDLEWARES GLOBALES
 // Se aplican a TODAS las solicitudes entrantes

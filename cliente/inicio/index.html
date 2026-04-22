@@ -21,10 +21,19 @@
 
     <!-- Barra de Navegación por Roles (Centrada y minimalista sin iconos) -->
     <nav class="hero__nav-roles"> <!-- Contenedor principal de la navegación -->
-        <!-- Enlace único al login de Bienestar Estudiantil -->
-        <a href="/bienestar/login" class="nav-rol"> <!-- Etiqueta de enlace con clase nav-rol -->
-            <span class="nav-rol__texto">BIENESTAR ESTUDIANTIL</span> <!-- Texto principal del enlace -->
-        </a> <!-- Cierre del enlace -->
+        <!-- Botón menú hamburguesa (solo visible en dispositivos móviles via CSS) -->
+        <button class="nav-mobile-toggle" aria-label="Abrir menú" id="btn-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div class="nav-roles-container" id="menu-roles">
+            <!-- Enlace único al login de Bienestar Estudiantil -->
+            <a href="/bienestar/login" class="nav-rol"> <!-- Etiqueta de enlace con clase nav-rol -->
+                <span class="nav-rol__texto">BIENESTAR ESTUDIANTIL</span> <!-- Texto principal del enlace -->
+            </a> <!-- Cierre del enlace -->
+        </div>
     </nav> <!-- Cierre del contenedor de navegación -->
 
     <!-- =============================================
@@ -177,6 +186,14 @@
             elemento.style.transform = 'translateY(20px)';
             elemento.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
             observador.observe(elemento);
+        });
+        // --- MENÚ MÓVIL ---
+        const btnMenu = document.getElementById('btn-menu');
+        const menuRoles = document.getElementById('menu-roles');
+
+        btnMenu.addEventListener('click', () => {
+            menuRoles.classList.toggle('nav-roles-container--activo');
+            btnMenu.classList.toggle('nav-mobile-toggle--activo');
         });
     </script>
 

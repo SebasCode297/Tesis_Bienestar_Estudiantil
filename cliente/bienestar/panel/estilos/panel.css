@@ -113,11 +113,29 @@ body {
     display: flex;
     align-items: center;
     padding: 0 30px;
+    gap: 15px;
+}
+
+.toggle-sidebar {
+    display: none;
+    background: var(--azul-marino);
+    color: var(--dorado);
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    align-items: center;
+    justify-content: center;
 }
 
 .header-top h1 {
     font-size: 1.2rem;
     color: var(--azul-marino);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .scroll-area {
@@ -706,4 +724,91 @@ body {
 
 .barra--pendiente {
     background: #e74c3c;
+}
+/* =============================================
+   DISEÑO RESPONSIVO (MÓVIL)
+   ============================================= */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        bottom: 0;
+        z-index: 2000;
+        transition: left 0.3s ease;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+    }
+
+    .sidebar--abierta {
+        left: 0;
+    }
+
+    .toggle-sidebar {
+        display: flex;
+    }
+
+    .header-top {
+        padding: 0 15px;
+    }
+
+    .scroll-area {
+        padding: 15px;
+    }
+
+    /* Grillas de 1 sola columna */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .formatos-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tarjeta-formato {
+        min-height: auto;
+    }
+
+    /* Tablas scrollables */
+    .modulo__body {
+        overflow-x: auto;
+    }
+
+    .tabla-formatos {
+        min-width: 600px; /* Forzamos scroll horizontal en tablas interiores */
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Wizard responsivo */
+    .wizard-card {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    .wizard-body {
+        flex-grow: 1;
+        overflow-y: auto;
+    }
+    .wizard-footer {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .wizard-footer div {
+        width: 100%;
+        gap: 5px;
+    }
+    .btn-wizard {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
 }

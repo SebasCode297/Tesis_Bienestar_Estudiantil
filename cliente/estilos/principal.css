@@ -254,7 +254,43 @@ body {
     letter-spacing: 3px; /* Espaciado entre letras para elegancia */
     text-transform: uppercase; /* Convertir a mayúsculas completamente */
     text-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Sombra de texto para legibilidad */
+    text-align: center;
 } /* Cierre de regla */
+
+/* Contenedor del menú en PC */
+.nav-roles-container {
+    display: flex;
+    height: 100%;
+}
+
+/* Botón Hamburguesa */
+.nav-mobile-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+}
+
+.nav-mobile-toggle span {
+    width: 100%;
+    height: 3px;
+    background-color: var(--dorado);
+    border-radius: 10px;
+    transition: all 0.3s linear;
+    position: relative;
+    transform-origin: 1px;
+}
+
+/* Animación de la hamburguesa a X */
+.nav-mobile-toggle--activo span:nth-child(1) { transform: rotate(45deg); }
+.nav-mobile-toggle--activo span:nth-child(2) { opacity: 0; transform: translateX(20px); }
+.nav-mobile-toggle--activo span:nth-child(3) { transform: rotate(-45deg); }
 
 /* =============================================
    SECCIÓN INFORMATIVA (Departamento y Misión)
@@ -477,7 +513,60 @@ footer {
 }
 
 @media (max-width: 600px) {
-    /* Oculta el menú de navegación en móvil */
+    /* Ajustes para el logo central en móviles muy pequeños */
+    .hero__logo {
+        gap: 8px;
+    }
+    .hero__logo-part {
+        font-size: 1.6rem;
+    }
+    .hero__logo-linea {
+        height: 40px;
+    }
+
+    /* Activar menú móvil */
+    .nav-mobile-toggle {
+        display: flex;
+        position: absolute;
+        right: 20px;
+        top: 25px;
+    }
+
+    .nav-roles-container {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        height: 100vh;
+        background: var(--azul-oscuro);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: right 0.4s ease-in-out;
+        z-index: 1000;
+        box-shadow: -5px 0 30px rgba(0,0,0,0.5);
+    }
+
+    .nav-roles-container--activo {
+        right: 0;
+    }
+
+    .nav-rol {
+        width: 100%;
+        height: auto;
+        padding: 20px;
+    }
+
+    .nav-rol::after {
+        display: none; /* Quitamos la línea de hover en móvil */
+    }
+
+    .nav-rol__texto {
+        font-size: 1rem;
+        letter-spacing: 2px;
+    }
+
+    /* Oculta el menú de navegación del navbar (si existiera) */
     .navbar__menu {
         display: none;
     }
@@ -490,7 +579,7 @@ footer {
         font-size: 1.75rem;
     }
 
-    .estadisticas {
+    .estatisticas {
         grid-template-columns: 1fr 1fr;
     }
 }
