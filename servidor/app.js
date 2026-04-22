@@ -13,6 +13,8 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path    = require('path');
+const PgSession = require('connect-pg-simple')(session);
+const pool    = require('./config/baseDatos');
 
 // Crea la instancia de la aplicación Express
 const app   = express();
@@ -35,17 +37,21 @@ app.use(express.urlencoded({ extended: true }));
 
 // =============================================
 // CONFIGURACIÓN DE SESIONES
-// express-session maneja las sesiones de usuario
-// en memoria (para desarrollo)
+// Se usa connect-pg-simple para que las sesiones
+// persistan en la base de datos (necesario en Vercel)
 // =============================================
 app.use(session({
+    store: new PgSession({
+        pool: pool,                // Conexión a la base de datos
+        tableName: 'session'      // Nombre de la tabla (el script semilla la puede crear)
+    }),
     secret:            process.env.SESION_SECRETO || 'bienestar_istpet_secreto_2026',
-    resave:            false,  // No guarda la sesión si no hubo cambios
-    saveUninitialized: false,  // No crea sesión si no hay datos
+    resave:            false,
+    saveUninitialized: false,
     cookie: {
-        maxAge:   3600000, // La sesión dura 1 hora (en milisegundos)
-        httpOnly: true,    // La cookie no es accesible desde JS del cliente (seguridad)
-        secure:   false    // true solo en producción con HTTPS
+        maxAge:   3600000,
+        httpOnly: true,
+        secure:   process.env.NODE_ENV === 'production' // true en producción
     }
 }));
 
@@ -54,19 +60,22 @@ app.use(session({
 // Cada módulo tiene su propio archivo de rutas
 // =============================================
 
-// Importa las rutas de cada módulo
-const rutasBienestar   = require('./rutas/autenticacion');
-const rutasFormatos    = require('./rutas/formatos');
-const rutasEstudiantes = require('./rutas/estudiantes');
-const rutasReportes    = require('./rutas/reportes');
+// Importa las rutas de cada módulo para separar la lógica por responsabilidades
+const rutasBienestar   = require('./rutas/autenticacion'); // Importa rutas de login y sesión
+const rutasFormatos    = require('./rutas/formatos'); // Importa rutas para gestión de documentos Word
+const rutasEstudiantes = require('./rutas/estudiantes'); // Importa rutas para gestión de datos de alumnos
+const rutasReportes    = require('./rutas/reportes'); // Importa rutas para generación de estadísticas
+const rutasAlertas     = require('./rutas/alertas'); // Importa rutas para el sistema de alertas tempranas
 
-// Registra las rutas bajo el prefijo '/bienestar'
-app.use('/bienestar', rutasBienestar);
+// Registra las rutas de autenticación bajo el prefijo '/bienestar' para acceso público
+app.use('/bienestar', rutasBienestar); // Middleware que monta las rutas de autenticación
 
-// Registra las APIs protegidas de cada módulo
-app.use('/bienestar/api/formatos', rutasFormatos);
-app.use('/bienestar/api/estudiantes', rutasEstudiantes);
-app.use('/bienestar/api/reportes', rutasReportes);
+// Registra las APIs protegidas de cada módulo funcional del sistema
+app.use('/bienestar/api/formatos', rutasFormatos); // Punto final para operaciones con plantillas
+app.use('/bienestar/api/estudiantes', rutasEstudiantes); // Punto final para CRUD de estudiantes
+app.use('/bienestar/api/reportes', rutasReportes); // Punto final para obtener datos de reportes
+app.use('/bienestar/api/alertas', rutasAlertas); // Punto final para la gestión de alertas
+
 
 // =============================================
 // RUTA PRINCIPAL — página de inicio
@@ -92,9 +101,16 @@ app.use((req, res) => {
 
 // =============================================
 // INICIO DEL SERVIDOR
+// En Vercel, el servidor se maneja como una función serverless.
+// Solo ejecutamos app.listen si no estamos en un entorno de Vercel.
 // =============================================
-app.listen(PUERTO, () => {
-    console.log(`✅ Servidor corriendo en http://localhost:${PUERTO}`);
-    console.log(`🏫 Sistema Bienestar Estudiantil — ISTPET`);
-    console.log(`📂 Arquitectura: 3 capas (Presentación / Negocio / Datos)`);
-});
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    app.listen(PUERTO, () => {
+        console.log(`✅ Servidor corriendo en http://localhost:${PUERTO}`);
+        console.log(`🏫 Sistema Bienestar Estudiantil — ISTPET`);
+        console.log(`📂 Arquitectura: 3 capas (Presentación / Negocio / Datos)`);
+    });
+}
+
+// Exportar la aplicación para que Vercel pueda usarla como serverless function
+module.exports = app;

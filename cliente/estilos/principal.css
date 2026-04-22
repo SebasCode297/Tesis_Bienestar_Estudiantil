@@ -138,357 +138,132 @@ body {
 }
 
 /* =============================================
-   SECCIÓN HERO (Bienvenida principal)
+   SECCIÓN HERO (Bienvenida Simplificada)
    ============================================= */
 .hero {
-    background: linear-gradient(135deg, var(--azul-oscuro) 0%, var(--azul-marino) 50%, var(--azul-medio) 100%);
-    min-height: 88vh;
-    display: flex;
-    align-items: center;
-    padding: 60px 5%;
+    height: calc(100vh - 90px); /* Restamos la altura de la nav roles */
+    background: radial-gradient(circle at center, #152565 0%, #0a1128 100%);
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     overflow: hidden;
 }
 
-/* Efecto decorativo de fondo (círculos semitransparentes) */
-.hero::before {
-    content: '';
-    position: absolute;
-    top: -100px;
-    right: -100px;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    background: rgba(201, 162, 39, 0.08);
-    pointer-events: none;
-}
-
-.hero::after {
-    content: '';
-    position: absolute;
-    bottom: -150px;
-    left: -80px;
-    width: 400px;
-    height: 400px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.04);
-    pointer-events: none;
-}
-
-/* Contenedor interno del hero en dos columnas */
-.hero__contenido {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-    position: relative;
-    z-index: 1;
-}
-
-/* Columna izquierda: texto */
-.hero__texto {
-    color: var(--blanco);
-}
-
-/* Etiqueta pequeña sobre el título */
-.hero__etiqueta {
-    display: inline-block;
-    background-color: rgba(201, 162, 39, 0.2);
-    color: var(--dorado);
-    border: 1px solid rgba(201, 162, 39, 0.4);
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-}
-
-.hero__titulo {
-    font-size: 2.8rem;
-    font-weight: 800;
-    line-height: 1.2;
-    margin-bottom: 10px;
-}
-
-/* Palabra resaltada en dorado dentro del título */
-.hero__titulo span {
-    color: var(--dorado);
-}
-
-.hero__subtitulo {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.85);
-    margin-bottom: 20px;
-}
-
-.hero__descripcion {
-    font-size: 1rem;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 35px;
-    max-width: 480px;
-}
-
-/* Grupo de botones del hero */
-.hero__botones {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-/* Botón principal dorado */
-.btn-primario {
-    background-color: var(--dorado);
-    color: var(--azul-marino);
-    padding: 14px 30px;
-    border: none;
-    border-radius: var(--radio);
-    font-size: 1rem;
-    font-weight: 700;
-    text-decoration: none;
-    cursor: pointer;
-    transition: var(--transicion);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-primario:hover {
-    background-color: var(--dorado-claro);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(201, 162, 39, 0.45);
-}
-
-/* Botón secundario con borde blanco */
-.btn-secundario {
-    background-color: transparent;
-    color: var(--blanco);
-    padding: 14px 30px;
-    border: 2px solid rgba(255,255,255,0.4);
-    border-radius: var(--radio);
-    font-size: 1rem;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    transition: var(--transicion);
-}
-
-.btn-secundario:hover {
-    border-color: var(--blanco);
-    background-color: rgba(255,255,255,0.1);
-    transform: translateY(-2px);
-}
-
-/* Columna derecha: tarjeta visual estadísticas */
-.hero__visual {
+/* Contenedor Principal del Logo (AHORA CENTRADO EN ESPACIO RESTANTE) */
+.hero__main {
+    flex: 1; /* Ocupa todo el espacio restante */
     display: flex;
     flex-direction: column;
-    gap: 16px;
-}
-
-/* Tarjeta flotante con estadísticas */
-.hero__tarjeta {
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px); /* Efecto vidrio esmerilado */
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 16px;
-    padding: 24px;
-    color: var(--blanco);
-}
-
-.hero__tarjeta h3 {
-    color: var(--dorado);
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 16px;
-}
-
-/* Grid de estadísticas dentro de la tarjeta */
-.estadisticas {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
-
-.estadistica__item {
+    align-items: center;
+    justify-content: center; /* Centrado vertical */
+    position: relative;
+    z-index: 2;
     text-align: center;
-    padding: 12px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 10px;
-}
-
-.estadistica__numero {
-    font-size: 1.8rem;
-    font-weight: 800;
     color: var(--dorado);
-    display: block;
+    transform: translateY(-20px); /* Ajuste visual leve hacia arriba */
 }
 
-.estadistica__etiqueta {
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.7);
-    margin-top: 4px;
+/* Logo central: Bienestar | Estudiantil */
+.hero__logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    filter: drop-shadow(0 0 15px rgba(201, 162, 39, 0.2));
+    animation: pulseLogo 3s infinite ease-in-out;
 }
 
-/* =============================================
-   SECCIÓN DE SERVICIOS / ACCESOS
-   ============================================= */
-.servicios {
-    padding: 80px 5%;
-    background-color: var(--blanco);
+@keyframes pulseLogo {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(201, 162, 39, 0.2)); }
+    50% { transform: scale(1.02); filter: drop-shadow(0 0 25px rgba(201, 162, 39, 0.4)); }
 }
 
-/* Encabezado de sección con línea dorada inferior */
-.seccion__encabezado {
-    text-align: center;
-    margin-bottom: 50px;
-}
-
-.seccion__encabezado h2 {
-    font-size: 2rem;
+.hero__logo-part {
+    font-size: 2.8rem; /* Tamaño reducido según pedido */
     font-weight: 800;
-    color: var(--azul-marino);
-    margin-bottom: 10px;
+    letter-spacing: 1px; /* Espaciado más cerrado */
+    line-height: 1;
+    color: var(--dorado);
 }
 
-/* Línea decorativa dorada debajo del título */
-.seccion__encabezado h2::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 4px;
+.hero__logo-part--izq {
+    text-align: right;
+}
+
+.hero__logo-part--der {
+    text-align: left;
+}
+
+.hero__logo-linea {
+    width: 2px;
+    height: 60px; /* Tamaño reducido proporcionalmente */
     background-color: var(--dorado);
-    margin: 10px auto 0;
     border-radius: 2px;
 }
 
-.seccion__encabezado p {
-    color: var(--gris-texto);
-    font-size: 1rem;
-    max-width: 500px;
-    margin: 0 auto;
+/* Barra de Navegación por Roles (CENTRADITA Y PREMIUM) */
+.hero__nav-roles { /* Define el contenedor de la barra de navegación */
+    width: 100%; /* El ancho ocupa el total de la pantalla */
+    height: 70px; /* Altura fija de la barra */
+    background: rgba(5, 10, 31, 0.95); /* Color de fondo azul muy oscuro con ligera transparencia */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque de cristal detrás del fondo */
+    border-bottom: 2px solid var(--dorado); /* Línea dorada en la parte inferior */
+    position: sticky; /* La barra se mantiene fija al hacer scroll */
+    top: 0; /* Posición al tope de la pantalla */
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
+    display: flex; /* Uso de flexbox para alinear contenido */
+    justify-content: center; /* Centra el contenido horizontalmente */
+    box-shadow: 0 4px 30px rgba(0,0,0,0.4); /* Sombra suave para dar profundidad */
 }
 
-/* Grid de tarjetas de servicio */
-.servicios__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 28px;
-    max-width: 1100px;
-    margin: 0 auto;
-}
+.nav-rol { /* Clase para el enlace de rol */
+    text-decoration: none; /* Quita el subrayado predeterminado */
+    display: flex; /* Permite alinear elementos internos */
+    align-items: center; /* Centra verticalmente los elementos */
+    justify-content: center; /* Centra horizontalmente los elementos */
+    color: var(--blanco); /* Color de texto blanco institucional */
+    transition: var(--transicion); /* Aplica transición suave a todos los cambios */
+    position: relative; /* Base para posicionar elementos absolutos internos */
+    padding: 0 40px; /* Espaciado lateral interno */
+    height: 100%; /* Ocupa el alto total del contenedor */
+} /* Cierre de regla */
 
-/* Tarjeta individual de servicio */
-.servicio__tarjeta {
-    background: var(--fondo-claro);
-    border-radius: 16px;
-    padding: 36px 28px;
-    text-align: center;
-    border: 2px solid transparent;
-    transition: var(--transicion);
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
+.nav-rol:hover { /* Efecto al pasar el cursor sobre el enlace */
+    background: rgba(201, 162, 39, 0.1); /* Fondo dorado muy tenue al pasar el mouse */
+} /* Cierre de regla */
 
-.servicio__tarjeta::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--azul-marino), var(--dorado));
-    transform: scaleX(0); /* Oculta la línea por defecto */
-    transform-origin: left;
-    transition: transform 0.4s ease;
-}
+.nav-rol::after { /* Elemento decorativo inferior */
+    content: ''; /* Contenido vacío necesario para el pseudo-elemento */
+    position: absolute; /* Posicionamiento libre respecto al padre */
+    bottom: 0; /* Ubicado en el borde inferior */
+    left: 0; /* Alineado a la izquierda */
+    width: 100%; /* Ocupa el ancho total */
+    height: 3px; /* Grosor de la línea decorativa */
+    background-color: var(--dorado); /* Color dorado institucional */
+    transform: scaleX(0); /* Inicialmente oculto por escala 0 */
+    transition: transform 0.4s ease; /* Transmisión suave de la escala */
+} /* Cierre de regla */
 
-.servicio__tarjeta:hover::before {
-    transform: scaleX(1); /* Aparece la línea al pasar el mouse */
-}
+.nav-rol:hover::after { /* Mostrar línea al pasar el mouse */
+    transform: scaleX(1); /* Escala a tamaño completo */
+} /* Cierre de regla */
 
-.servicio__tarjeta:hover {
-    border-color: var(--azul-marino);
-    box-shadow: var(--sombra-hover);
-    transform: translateY(-6px);
-    background: var(--blanco);
-}
-
-/* Ícono SVG de cada tarjeta */
-.servicio__icono {
-    width: 70px;
-    height: 70px;
-    background: linear-gradient(135deg, var(--azul-marino), var(--azul-medio));
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    transition: var(--transicion);
-}
-
-.servicio__icono svg {
-    width: 34px;
-    height: 34px;
-    stroke: var(--blanco);
-    fill: none;
-    stroke-width: 1.8;
-}
-
-.servicio__tarjeta:hover .servicio__icono {
-    background: linear-gradient(135deg, var(--dorado), var(--dorado-claro));
-}
-
-.servicio__tarjeta:hover .servicio__icono svg {
-    stroke: var(--azul-marino);
-}
-
-.servicio__tarjeta h3 {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--azul-marino);
-    margin-bottom: 10px;
-}
-
-.servicio__tarjeta p {
-    color: var(--gris-texto);
-    font-size: 0.9rem;
-    line-height: 1.7;
-    margin-bottom: 22px;
-}
-
-/* Enlace de cada tarjeta */
-.servicio__enlace {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--azul-marino);
-    font-weight: 600;
-    font-size: 0.88rem;
-    text-decoration: none;
-    transition: var(--transicion);
-}
-
-.servicio__enlace:hover {
-    color: var(--dorado);
-    gap: 10px;
-}
+.nav-rol__texto { /* Clase para el texto del rol */
+    font-size: 1.2rem; /* Tamaño de fuente destacado */
+    font-weight: 800; /* Grosor de fuente extra negrita */
+    letter-spacing: 3px; /* Espaciado entre letras para elegancia */
+    text-transform: uppercase; /* Convertir a mayúsculas completamente */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Sombra de texto para legibilidad */
+} /* Cierre de regla */
 
 /* =============================================
-   SECCIÓN INFORMATIVA (Sobre el departamento)
+   SECCIÓN INFORMATIVA (Departamento y Misión)
    ============================================= */
 .informacion {
-    padding: 80px 5%;
-    background: linear-gradient(135deg, var(--azul-marino) 0%, var(--azul-medio) 100%);
+    padding: 100px 5%;
+    background-color: #0d1333; /* Un azul ligeramente distinto para diferenciar del hero */
     color: var(--blanco);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Dos columnas: misión e info del departamento */
@@ -563,17 +338,19 @@ body {
 
 /* Tarjeta de valor individual */
 .valor__tarjeta {
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: #151d52; /* Color sólido para mejor distinción */
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: var(--radio);
     padding: 22px;
     transition: var(--transicion);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .valor__tarjeta:hover {
-    background: rgba(255,255,255,0.15);
-    transform: translateX(5px);
+    background: #1a2566;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    border-color: var(--dorado);
 }
 
 .valor__tarjeta h4 {
@@ -595,9 +372,10 @@ body {
    PIE DE PÁGINA
    ============================================= */
 footer {
-    background-color: var(--azul-oscuro);
-    color: rgba(255,255,255,0.75);
-    padding: 40px 5% 20px;
+    background-color: #070b1f; /* El tono más oscuro para el cierre */
+    color: rgba(255,255,255,0.7);
+    padding: 60px 5% 30px;
+    border-top: 1px solid rgba(255,255,255,0.05);
 }
 
 .footer__contenido {

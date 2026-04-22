@@ -27,23 +27,6 @@
              ========================================== -->
         <div class="panel-izquierdo" aria-hidden="true">
 
-            <!-- Escudo del instituto como SVG incrustado -->
-            <svg class="panel-izquierdo__escudo"
-                 viewBox="0 0 80 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Forma exterior del escudo -->
-                <path d="M40 3 L77 18 L77 48 C77 68 60 83 40 87 C20 83 3 68 3 48 L3 18 Z"
-                      fill="#c9a227" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
-                <!-- Forma interior del escudo (efecto bicolor) -->
-                <path d="M40 12 L68 24 L68 46 C68 62 55 74 40 77 C25 74 12 62 12 46 L12 24 Z"
-                      fill="#1e2a6e"/>
-                <!-- Cruz horizontal -->
-                <line x1="22" y1="46" x2="58" y2="46"
-                      stroke="#c9a227" stroke-width="3.5" stroke-linecap="round"/>
-                <!-- Cruz vertical -->
-                <line x1="40" y1="28" x2="40" y2="64"
-                      stroke="#c9a227" stroke-width="3.5" stroke-linecap="round"/>
-            </svg>
-
             <!-- Nombre del instituto -->
             <div class="panel-izquierdo__nombre">
                 <h1>ISTPET</h1>
@@ -112,23 +95,9 @@
                                 class="btn-ojo"
                                 id="btn-mostrar-contrasena"
                                 aria-label="Mostrar u ocultar contraseña"
+                                style="font-size: 0.75rem; font-weight: 600; padding: 0 10px;"
                             >
-                                <!-- Ícono SVG de ojo (visible por defecto) -->
-                                <svg id="icono-ojo-abierto"
-                                     width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                    <circle cx="12" cy="12" r="3"/>
-                                </svg>
-                                <!-- Ícono SVG de ojo tachado (oculto por defecto) -->
-                                <svg id="icono-ojo-cerrado"
-                                     width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2"
-                                     style="display:none;" aria-hidden="true">
-                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-                                    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-                                    <line x1="1" y1="1" x2="23" y2="23"/>
-                                </svg>
+                                Ver
                             </button>
                         </div>
                     </div>
@@ -144,21 +113,14 @@
 
                     <!-- Mensaje de error (oculto por defecto, JS lo activa) -->
                     <div class="mensaje-error" id="mensaje-error" role="alert">
-                        <!-- Ícono de alerta -->
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="12" y1="8" x2="12" y2="12"/>
-                            <line x1="12" y1="16" x2="12.01" y2="16"/>
-                        </svg>
                         <!-- El texto del error se escribe con JS -->
                         <span id="texto-error"></span>
                     </div>
 
                 </form>
 
-                <!-- Enlace para volver a la página de inicio -->
-                <a href="/" class="link-inicio">← Volver al inicio</a>
+                <!-- Enlace para volver a la página de inicio (sin flecha decorativa) -->
+                <a href="/" class="link-inicio">Volver al inicio</a>
 
             </div>
         </div>
@@ -171,114 +133,102 @@
          sin recargar la página
          ============================================= -->
     <script>
-        // =============================================
-        // Referencias a los elementos del DOM
-        // =============================================
-        const formulario       = document.getElementById('formulario-autenticacion');
-        const campoCorrro      = document.getElementById('campo-correo');
-        const campoContrasena  = document.getElementById('campo-contrasena');
-        const btnIngresar      = document.getElementById('btn-ingresar');
-        const mensajeError     = document.getElementById('mensaje-error');
-        const textoError       = document.getElementById('texto-error');
-        const btnMostrar       = document.getElementById('btn-mostrar-contrasena');
-        const iconoOjoAbierto  = document.getElementById('icono-ojo-abierto');
-        const iconoOjoCerrado  = document.getElementById('icono-ojo-cerrado');
+        // Referencia al elemento raíz del formulario de inicio de sesión
+        const formulario       = document.getElementById('formulario-autenticacion'); // Captura el formulario por su ID
+        // Referencia al campo de entrada del correo electrónico institucional
+        const campoCorrro      = document.getElementById('campo-correo'); // Captura el input del correo
+        // Referencia al campo de entrada de la contraseña del usuario
+        const campoContrasena  = document.getElementById('campo-contrasena'); // Captura el input de la contraseña
+        // Referencia al botón principal que dispara el envío de datos
+        const btnIngresar      = document.getElementById('btn-ingresar'); // Captura el botón ingresar
+        // Referencia al contenedor que muestra mensajes de error visuales
+        const mensajeError     = document.getElementById('mensaje-error'); // Captura el div de alerta
+        // Referencia al span interno donde se inserta el texto del error
+        const textoError       = document.getElementById('texto-error'); // Captura el elemento de texto del error
+        // Referencia al botón especial para alternar visibilidad de contraseña
+        const btnMostrar       = document.getElementById('btn-mostrar-contrasena'); // Captura el botón del ojo (texto ver)
 
-        // =============================================
-        // Función: mostrarError
-        // Muestra el div de error con el mensaje recibido
-        // =============================================
-        function mostrarError(mensaje) {
-            textoError.textContent = mensaje;
-            mensajeError.classList.add('visible');
-        }
+        // Función encargada de hacer visible el mensaje de error en pantalla
+        function mostrarError(mensaje) { // Recibe el texto descriptivo del error ocurrido
+            textoError.textContent = mensaje; // Inserta el mensaje en el elemento HTML correspondiente
+            mensajeError.classList.add('visible'); // Añade la clase CSS que hace visible el contenedor
+        } // Fin de la función mostrarError
 
-        // =============================================
-        // Función: ocultarError
-        // Oculta el div de error
-        // =============================================
-        function ocultarError() {
-            mensajeError.classList.remove('visible');
-            textoError.textContent = '';
-        }
+        // Función encargada de limpiar y ocultar la alerta de error
+        function ocultarError() { // No requiere parámetros
+            mensajeError.classList.remove('visible'); // Quita la clase CSS de visibilidad
+            textoError.textContent = ''; // Limpia el contenido de texto previo
+        } // Fin de la función ocultarError
 
-        // =============================================
-        // Toggle: mostrar/ocultar contraseña al hacer
-        // clic en el ícono del ojo
-        // =============================================
-        btnMostrar.addEventListener('click', () => {
-            if (campoContrasena.type === 'password') {
-                // Muestra la contraseña
-                campoContrasena.type = 'text';
-                iconoOjoAbierto.style.display = 'none';
-                iconoOjoCerrado.style.display = 'block';
-            } else {
-                // Vuelve a ocultar la contraseña
-                campoContrasena.type = 'password';
-                iconoOjoAbierto.style.display = 'block';
-                iconoOjoCerrado.style.display = 'none';
-            }
-        });
+        // Escucha el evento clic para mostrar u ocultar la contraseña escrita
+        btnMostrar.addEventListener('click', () => { // Función anónima ejecutada al hacer clic
+            if (campoContrasena.type === 'password') { // Verifica si el tipo actual es oculto (password)
+                // Cambia el tipo a texto para que los caracteres sean legibles
+                campoContrasena.type = 'text'; // Cambia el atributo type del input
+                btnMostrar.textContent = 'Ocultar'; // Actualiza el texto del botón a Ocultar
+            } else { // Si el tipo ya era texto
+                // Regresa el tipo a password para proteger la visualización
+                campoContrasena.type = 'password'; // Restaura el atributo type original
+                btnMostrar.textContent = 'Ver'; // Actualiza el texto del botón a Ver
+            } // Fin de la condición de alternancia
+        }); // Fin del evento de escucha del botón mostrar
 
-        // Oculta el error cuando el usuario empieza a escribir
-        campoCorrro.addEventListener('input', ocultarError);
-        campoContrasena.addEventListener('input', ocultarError);
+        // Agrega evento para ocultar el error mientras el usuario edita el correo
+        campoCorrro.addEventListener('input', ocultarError); // Llama a ocultarError en cada pulsación
+        // Agrega evento para ocultar el error mientras el usuario edita la contraseña
+        campoContrasena.addEventListener('input', ocultarError); // Llama a ocultarError en cada pulsación
 
-        // =============================================
-        // Maneja el envío del formulario
-        // Envía los datos al backend por fetch (AJAX)
-        // para evitar recargar la página al fallar
-        // =============================================
-        formulario.addEventListener('submit', async (evento) => {
-            // Previene el comportamiento por defecto del formulario
-            evento.preventDefault();
-            ocultarError();
+        // Manejador principal para el envío del formulario mediante tecnología AJAX
+        formulario.addEventListener('submit', async (evento) => { // Función asíncrona para manejar la petición
+            // Evita que el navegador recargue la página automáticamente
+            evento.preventDefault(); // Detiene el comportamiento estándar de envío
+            ocultarError(); // Asegura que no haya mensajes de error previos visibles
 
-            // Obtiene los valores de los campos
-            const correo    = campoCorrro.value.trim();
-            const contrasena = campoContrasena.value;
+            // Captura los valores actuales ingresados por el usuario
+            const correo    = campoCorrro.value.trim(); // Obtiene correo y elimina espacios sobrantes
+            const contrasena = campoContrasena.value; // Obtiene el valor literal de la contraseña
 
-            // Validación en el lado del cliente
-            if (!correo || !contrasena) {
-                mostrarError('Por favor completa todos los campos');
-                return;
-            }
+            // Verifica que los campos obligatorios no estén vacíos antes de enviar
+            if (!correo || !contrasena) { // Condición de validación básica
+                mostrarError('Por favor completa todos los campos'); // Informa al usuario del campo faltante
+                return; // Detiene la ejecución del proceso de envío
+            } // Fin de validación previa
 
-            // Cambia el botón a estado de carga
-            btnIngresar.textContent = 'Verificando...';
-            btnIngresar.disabled = true;
+            // Actualiza la interfaz para indicar que se está procesando la solicitud
+            btnIngresar.textContent = 'Verificando...'; // Cambia el texto del botón
+            btnIngresar.disabled = true; // Deshabilita el botón para evitar clics duplicados
 
-            try {
-                // Envía la solicitud POST con las credenciales en formato JSON
-                const respuesta = await fetch('/bienestar/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ correo, contrasena })
-                });
+            try { // Inicia bloque para manejo de riesgos en la petición de red
+                // Realiza la petición asíncrona POST al endpoint de autenticación
+                const respuesta = await fetch('/bienestar/auth/login', { // Llama a la API del backend
+                    method: 'POST', // Define el método HTTP como POST
+                    headers: { // Configura los metadatos de la comunicación
+                        'Content-Type': 'application/json' // Indica que el cuerpo es un objeto JSON
+                    }, // Fin de configuración de cabeceras
+                    body: JSON.stringify({ correo, contrasena }) // Convierte datos a string JSON
+                }); // Espera la resolución de la promesa fetch
 
-                // Convierte la respuesta del servidor a JSON
-                const datos = await respuesta.json();
+                // Procesa la respuesta del servidor interpretándola como JSON
+                const datos = await respuesta.json(); // Convierte el flujo de datos a objeto JS
 
-                if (datos.exito) {
-                    // ✅ Credenciales correctas: redirige al panel
-                    btnIngresar.textContent = '¡Acceso concedido!';
-                    window.location.href = datos.redirigir;
-                } else {
-                    // ❌ Error: muestra el mensaje devuelto por el servidor
-                    mostrarError(datos.mensaje || 'Error al iniciar sesión');
-                    btnIngresar.textContent = 'Ingresar';
-                    btnIngresar.disabled = false;
-                }
+                if (datos.exito) { // Verifica si el backend confirmó las credenciales
+                    // Informa éxito y ejecuta la redirección configurada
+                    btnIngresar.textContent = '¡Acceso concedido!'; // Mensaje final de éxito en botón
+                    window.location.href = datos.redirigir; // Redirige al panel administrativo principal
+                } else { // Si las credenciales fueron rechazadas o hubo error lógico
+                    // Muestra el motivo del fallo devuelto por el servidor
+                    mostrarError(datos.mensaje || 'Error al iniciar sesión'); // Usa mensaje de API o genérico
+                    btnIngresar.textContent = 'Ingresar'; // Restaura el texto original del botón
+                    btnIngresar.disabled = false; // Reactiva el botón para un nuevo intento
+                } // Fin de verificación de éxito de autenticación
 
-            } catch (errorRed) {
-                // Error de red (servidor caído, sin conexión, etc.)
-                mostrarError('No se pudo conectar con el servidor. Intenta nuevamente.');
-                btnIngresar.textContent = 'Ingresar';
-                btnIngresar.disabled = false;
-            }
-        });
+            } catch (errorRed) { // Captura fallos de conectividad o errores de infraestructura
+                // Informa al usuario sobre la imposibilidad de contactar al backend
+                mostrarError('No se pudo conectar con el servidor. Intenta nuevamente.'); // Mensaje de red
+                btnIngresar.textContent = 'Ingresar'; // Restaura el texto del botón
+                btnIngresar.disabled = false; // Reactiva la interfaz para reintentar
+            } // Fin del bloque try-catch de red
+        }); // Fin del evento submit del formulario
     </script>
 
 </body>

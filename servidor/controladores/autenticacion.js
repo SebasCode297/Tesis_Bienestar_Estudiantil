@@ -95,8 +95,8 @@ const cerrarSesion = (req, res) => {
         if (error) {
             console.error('❌ Error al cerrar sesión:', error.message);
         }
-        // Redirige al login sin importar el resultado
-        res.redirect('/bienestar/login');
+        // Redirige al inicio (Landing Page)
+        res.redirect('/');
     });
 };
 

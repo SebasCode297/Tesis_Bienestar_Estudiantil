@@ -18,246 +18,30 @@
 </head>
 <body>
 
-    <!-- =============================================
-         BARRA DE NAVEGACIÓN
-         Contiene el logo institucional, el nombre del
-         instituto y los enlaces de navegación principales
-         ============================================= -->
-    <nav class="navbar" role="navigation" aria-label="Navegación principal">
 
-        <!-- Marca: logo + nombre del instituto -->
-        <a href="#inicio" class="navbar__marca">
-            <!-- SVG del escudo institucional (forma de escudo simple con los colores del instituto) -->
-            <svg class="navbar__escudo" viewBox="0 0 50 55" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <!-- Forma del escudo -->
-                <path d="M25 2 L48 12 L48 30 C48 42 37 52 25 54 C13 52 2 42 2 30 L2 12 Z"
-                      fill="#c9a227" stroke="#ffffff" stroke-width="1.5"/>
-                <!-- Cruz horizontal -->
-                <line x1="13" y1="28" x2="37" y2="28" stroke="#1e2a6e" stroke-width="3" stroke-linecap="round"/>
-                <!-- Cruz vertical -->
-                <line x1="25" y1="16" x2="25" y2="40" stroke="#1e2a6e" stroke-width="3" stroke-linecap="round"/>
-                <!-- Letras ISTPET -->
-                <text x="25" y="33" text-anchor="middle" fill="#1e2a6e"
-                      font-size="5" font-weight="bold" font-family="Arial">ISTPET</text>
-            </svg>
-
-            <!-- Nombre del instituto en dos líneas -->
-            <div class="navbar__nombre">
-                <span>ISTPET</span>
-                <span>Instituto Superior Tecnológico</span>
-            </div>
-        </a>
-
-        <!-- Menú de navegación con anclas a las secciones de la página -->
-        <ul class="navbar__menu">
-            <li><a href="#inicio">Inicio</a></li>
-            <li><a href="#servicios">Servicios</a></li>
-            <li><a href="#departamento">Departamento</a></li>
-            <li><a href="#contacto">Contacto</a></li>
-            <!-- Botón destacado para acceder al sistema -->
-            <li>
-                <a href="/bienestar/login" class="navbar__btn-ingreso" id="btn-ingresar-sistema">
-                    Ingresar al Sistema
-                </a>
-            </li>
-        </ul>
-    </nav>
+    <!-- Barra de Navegación por Roles (Centrada y minimalista sin iconos) -->
+    <nav class="hero__nav-roles"> <!-- Contenedor principal de la navegación -->
+        <!-- Enlace único al login de Bienestar Estudiantil -->
+        <a href="/bienestar/login" class="nav-rol"> <!-- Etiqueta de enlace con clase nav-rol -->
+            <span class="nav-rol__texto">BIENESTAR ESTUDIANTIL</span> <!-- Texto principal del enlace -->
+        </a> <!-- Cierre del enlace -->
+    </nav> <!-- Cierre del contenedor de navegación -->
 
     <!-- =============================================
-         SECCIÓN HERO — Bienvenida principal
-         Primera vista que el usuario ve al cargar la página
+         SECCIÓN HERO (Bienvenida)
          ============================================= -->
-    <section class="hero" id="inicio" aria-label="Sección de bienvenida">
-        <div class="hero__contenido">
-
-            <!-- Columna izquierda: texto de bienvenida -->
-            <div class="hero__texto">
-                <!-- Etiqueta indicadora -->
-                <span class="hero__etiqueta">Sistema de Gestión Institucional</span>
-
-                <!-- Título principal con palabra destacada en dorado -->
-                <h1 class="hero__titulo">
-                    Sistema de <span>Bienestar</span><br>Estudiantil
-                </h1>
-
-                <!-- Nombre del instituto -->
-                <p class="hero__subtitulo">Instituto Superior Tecnológico</p>
-
-                <!-- Descripción breve del sistema -->
-                <p class="hero__descripcion">
-                    Plataforma digital para la gestión, seguimiento y control del
-                    bienestar académico y personal de los estudiantes del instituto.
-                    Accede según tu rol asignado.
-                </p>
-
-                <!-- Botones de acción -->
-                <div class="hero__botones">
-                    <!-- Botón principal: acceso al sistema -->
-                    <a href="/bienestar/login" class="btn-primario" id="btn-hero-ingresar">
-                        <!-- Ícono de entrada (flecha) -->
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                            <polyline points="10 17 15 12 10 7"/>
-                            <line x1="15" y1="12" x2="3" y2="12"/>
-                        </svg>
-                        Ingresar al Sistema
-                    </a>
-
-                    <!-- Botón secundario: más información -->
-                    <a href="#servicios" class="btn-secundario" id="btn-hero-mas-info">
-                        Conocer más
-                    </a>
-                </div>
+    <header class="hero">
+        <div class="hero__main">
+            <!-- Logo central -->
+            <div class="hero__logo">
+                <div class="hero__logo-part hero__logo-part--izq">BIENESTAR</div>
+                <div class="hero__logo-linea"></div>
+                <div class="hero__logo-part hero__logo-part--der">ESTUDIANTIL</div>
             </div>
-
-            <!-- Columna derecha: tarjeta con estadísticas del departamento -->
-            <div class="hero__visual">
-                <div class="hero__tarjeta">
-                    <h3>Resumen del Departamento</h3>
-
-                    <!-- Cuatro estadísticas en cuadrícula 2x2 -->
-                    <div class="estadisticas">
-                        <div class="estadistica__item">
-                            <span class="estadistica__numero">3</span>
-                            <span class="estadistica__etiqueta">Roles de acceso</span>
-                        </div>
-                        <div class="estadistica__item">
-                            <span class="estadistica__numero">100%</span>
-                            <span class="estadistica__etiqueta">Sistema digital</span>
-                        </div>
-                        <div class="estadistica__item">
-                            <span class="estadistica__numero">24/7</span>
-                            <span class="estadistica__etiqueta">Disponibilidad</span>
-                        </div>
-                        <div class="estadistica__item">
-                            <span class="estadistica__numero">1</span>
-                            <span class="estadistica__etiqueta">Institución</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Segunda tarjeta: roles disponibles en el sistema -->
-                <div class="hero__tarjeta">
-                    <h3>Roles del Sistema</h3>
-                    <!-- Lista de los 3 roles que tendrá el sistema -->
-                    <ul style="list-style:none; display:flex; flex-direction:column; gap:10px;">
-                        <li style="display:flex; align-items:center; gap:10px; color:rgba(255,255,255,0.85); font-size:0.9rem;">
-                            <!-- Punto dorado indicador -->
-                            <span style="width:8px;height:8px;background:#c9a227;border-radius:50%;flex-shrink:0;"></span>
-                            Bienestar Estudiantil (Administrador)
-                        </li>
-                        <li style="display:flex; align-items:center; gap:10px; color:rgba(255,255,255,0.85); font-size:0.9rem;">
-                            <span style="width:8px;height:8px;background:#c9a227;border-radius:50%;flex-shrink:0;"></span>
-                            Estudiante
-                        </li>
-                        <li style="display:flex; align-items:center; gap:10px; color:rgba(255,255,255,0.85); font-size:0.9rem;">
-                            <span style="width:8px;height:8px;background:#c9a227;border-radius:50%;flex-shrink:0;"></span>
-                            Docente
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
         </div>
-    </section>
+    </header>
 
-    <!-- =============================================
-         SECCIÓN DE SERVICIOS
-         Muestra las 3 áreas de acceso del sistema (tarjetas)
-         ============================================= -->
-    <section class="servicios" id="servicios" aria-label="Servicios del sistema">
-        <!-- Encabezado de la sección -->
-        <div class="seccion__encabezado">
-            <h2>Accesos del Sistema</h2>
-            <p>Ingresa al módulo correspondiente según el rol que tienes asignado</p>
-        </div>
 
-        <!-- Cuadrícula de 3 tarjetas de servicio -->
-        <div class="servicios__grid">
-
-            <!-- Tarjeta 1: Bienestar Estudiantil -->
-            <div class="servicio__tarjeta" id="tarjeta-bienestar">
-                <!-- Ícono SVG de administración/documento -->
-                <div class="servicio__icono" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <rect x="3" y="3" width="18" height="18" rx="3"/>
-                        <line x1="8" y1="9" x2="16" y2="9"/>
-                        <line x1="8" y1="13" x2="16" y2="13"/>
-                        <line x1="8" y1="17" x2="12" y2="17"/>
-                    </svg>
-                </div>
-                <h3>Bienestar Estudiantil</h3>
-                <p>
-                    Gestiona registros, seguimientos, reportes y toda la
-                    información del departamento de bienestar de forma centralizada.
-                </p>
-                <!-- Enlace al login de bienestar -->
-                <a href="/bienestar/login" class="servicio__enlace" id="enlace-bienestar">
-                    Acceder como Administrador
-                    <!-- Flecha indicadora -->
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                        <line x1="5" y1="12" x2="19" y2="12"/>
-                        <polyline points="12 5 19 12 12 19"/>
-                    </svg>
-                </a>
-            </div>
-
-            <!-- Tarjeta 2: Estudiante -->
-            <div class="servicio__tarjeta" id="tarjeta-estudiante">
-                <!-- Ícono SVG de estudiante/graduado -->
-                <div class="servicio__icono" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 2 L22 7 L12 12 L2 7 Z"/>
-                        <path d="M6 9.5 L6 16 C6 16 9 19 12 19 C15 19 18 16 18 16 L18 9.5"/>
-                        <line x1="22" y1="7" x2="22" y2="13"/>
-                    </svg>
-                </div>
-                <h3>Estudiante</h3>
-                <p>
-                    Consulta tu información académica, seguimientos asignados,
-                    documentos y notificaciones del departamento de bienestar.
-                </p>
-                <!-- Enlace al login de estudiante (próximamente) -->
-                <a href="#" class="servicio__enlace" id="enlace-estudiante">
-                    Acceder como Estudiante
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                        <line x1="5" y1="12" x2="19" y2="12"/>
-                        <polyline points="12 5 19 12 12 19"/>
-                    </svg>
-                </a>
-            </div>
-
-            <!-- Tarjeta 3: Docente -->
-            <div class="servicio__tarjeta" id="tarjeta-docente">
-                <!-- Ícono SVG de docente/pizarrón -->
-                <div class="servicio__icono" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                        <rect x="2" y="3" width="20" height="13" rx="2"/>
-                        <line x1="8" y1="21" x2="16" y2="21"/>
-                        <line x1="12" y1="16" x2="12" y2="21"/>
-                    </svg>
-                </div>
-                <h3>Docente</h3>
-                <p>
-                    Revisa el estado académico de los estudiantes, realiza
-                    reportes de seguimiento y coordina con el departamento.
-                </p>
-                <!-- Enlace al login de docente (próximamente) -->
-                <a href="#" class="servicio__enlace" id="enlace-docente">
-                    Acceder como Docente
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                        <line x1="5" y1="12" x2="19" y2="12"/>
-                        <polyline points="12 5 19 12 12 19"/>
-                    </svg>
-                </a>
-            </div>
-
-        </div>
-    </section>
 
     <!-- =============================================
          SECCIÓN INFORMATIVA
@@ -345,8 +129,6 @@
                 <h4>Accesos</h4>
                 <ul>
                     <li><a href="/bienestar/login">Bienestar Estudiantil</a></li>
-                    <li><a href="#">Estudiantes</a></li>
-                    <li><a href="#">Docentes</a></li>
                 </ul>
             </div>
 
@@ -375,92 +157,26 @@
          SCRIPT PRINCIPAL
          Pequeño script para interacciones básicas de la página
          ============================================= -->
+    <!-- =============================================
+         SCRIPT PRINCIPAL (Plexus + Animaciones)
+         ============================================= -->
     <script>
-        // =============================================
-        // Animación de aparición de elementos al hacer scroll
-        // Se ejecuta cuando el usuario baja en la página
-        // =============================================
+        // --- ANIMACIÓN DE APARICIÓN (SCROLL) ---
+        const elementosAnimados = document.querySelectorAll('.valor__tarjeta, .informacion__texto');
+        const observador = new IntersectionObserver((entradas) => {
+            entradas.forEach((entrada) => {
+                if (entrada.isIntersecting) {
+                    entrada.target.style.opacity = '1';
+                    entrada.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
 
-        // Selecciona todas las tarjetas de servicio y valor
-        const elementosAnimados = document.querySelectorAll(
-            '.servicio__tarjeta, .valor__tarjeta, .hero__tarjeta'
-        );
-
-        // Crea un observador que detecta cuando un elemento entra en la vista
-        const observador = new IntersectionObserver(
-            (entradas) => {
-                entradas.forEach((entrada) => {
-                    // Si el elemento es visible, agrega la clase de animación
-                    if (entrada.isIntersecting) {
-                        entrada.target.style.opacity = '1';
-                        entrada.target.style.transform = 'translateY(0)';
-                    }
-                });
-            },
-            {
-                threshold: 0.1 // Se activa cuando el 10% del elemento es visible
-            }
-        );
-
-        // Aplica el estado inicial oculto y observa cada elemento
         elementosAnimados.forEach((elemento) => {
             elemento.style.opacity = '0';
             elemento.style.transform = 'translateY(20px)';
-            elemento.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            elemento.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
             observador.observe(elemento);
-        });
-
-        // Fallback: si después de 1.2s un elemento aún no es visible,
-        // lo muestra de todas formas para evitar que quede invisible
-        setTimeout(() => {
-            elementosAnimados.forEach((elemento) => {
-                if (elemento.style.opacity === '0') {
-                    elemento.style.opacity = '1';
-                    elemento.style.transform = 'translateY(0)';
-                }
-            });
-        }, 1200);
-
-        // =============================================
-        // Resaltado del enlace activo en el navbar
-        // Cambia el estilo del enlace según la sección visible
-        // =============================================
-
-        // Selecciona todas las secciones con id y los enlaces del menú
-        const secciones = document.querySelectorAll('section[id]');
-        const enlacesMenu = document.querySelectorAll('.navbar__menu a:not(.navbar__btn-ingreso)');
-
-        // Observador para detectar qué sección está en pantalla
-        const observadorSección = new IntersectionObserver(
-            (entradas) => {
-                entradas.forEach((entrada) => {
-                    if (entrada.isIntersecting) {
-                        // Quita el resaltado de todos los enlaces
-                        enlacesMenu.forEach((enlace) => {
-                            enlace.style.backgroundColor = '';
-                            enlace.style.opacity = '0.9';
-                        });
-
-                        // Resalta el enlace correspondiente a la sección visible
-                        const idSeccion = entrada.target.getAttribute('id');
-                        const enlaceActivo = document.querySelector(
-                            `.navbar__menu a[href="#${idSeccion}"]`
-                        );
-                        if (enlaceActivo) {
-                            enlaceActivo.style.backgroundColor = 'rgba(255,255,255,0.15)';
-                            enlaceActivo.style.opacity = '1';
-                        }
-                    }
-                });
-            },
-            {
-                threshold: 0.3 // Se activa cuando el 30% de la sección es visible
-            }
-        );
-
-        // Observa cada sección de la página
-        secciones.forEach((seccion) => {
-            observadorSección.observe(seccion);
         });
     </script>
 

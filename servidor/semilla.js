@@ -9,20 +9,43 @@ require('dotenv').config();
 const { Pool }  = require('pg');
 const bcrypt    = require('bcryptjs');
 
-// Crea la conexión al servidor de PostgreSQL
-const pool = new Pool({
-    host:     process.env.DB_HOST,
-    port:     process.env.DB_PUERTO,
-    user:     process.env.DB_USUARIO,
-    password: process.env.DB_CONTRASENA,
-    database: process.env.DB_NOMBRE,
-});
+// Configuración del Pool:prioriza DATABASE_URL
+const poolConfig = process.env.DATABASE_URL 
+    ? { connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }
+    : {
+        host:     process.env.DB_HOST,
+        port:     process.env.DB_PUERTO,
+        user:     process.env.DB_USUARIO,
+        password: process.env.DB_CONTRASENA,
+        database: process.env.DB_NOMBRE,
+    };
+
+const pool = new Pool(poolConfig);
 
 // Función principal asíncrona
 const inicializarBaseDatos = async () => {
     console.log('🔄 Iniciando configuración de la base de datos...\n');
 
     try {
+        // ---- PASO 0: Crear la tabla session (para connect-pg-simple) ----
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS "session" (
+                "sid" varchar NOT NULL COLLATE "default",
+                "sess" json NOT NULL,
+                "expire" timestamp(6) NOT NULL
+            ) WITH (OIDS=FALSE);
+            
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'session_pkey') THEN
+                    ALTER TABLE "session" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
+                END IF;
+            END $$;
+
+            CREATE INDEX IF NOT EXISTS "IDX_session_expire" ON "session" ("expire");
+        `);
+        console.log('✅ Tabla "session" creada o ya existía.');
+
         // ---- PASO 1: Crear la tabla usuarios ----
         await pool.query(`
             CREATE TABLE IF NOT EXISTS usuarios (
@@ -49,22 +72,27 @@ const inicializarBaseDatos = async () => {
         `);
         console.log('✅ Tabla "formatos" creada o ya existía.');
 
-        // ---- PASO 1.6: Crear la tabla estudiantes ----
+        // ---- PASO 1.6: Re-crear tablas de estudiantes limpias ----
+        // Eliminamos las viejas si existen para aplicar la nueva estructura masiva
+        await pool.query('DROP TABLE IF EXISTS estudiante_formatos;');
+        await pool.query('DROP TABLE IF EXISTS estudiantes;');
+
         await pool.query(`
-            CREATE TABLE IF NOT EXISTS estudiantes (
-                id        SERIAL PRIMARY KEY,
-                cedula    VARCHAR(15) UNIQUE NOT NULL,
-                nombre    VARCHAR(150) NOT NULL,
-                carrera   VARCHAR(100) NOT NULL,
-                periodo   VARCHAR(50) NOT NULL,
-                correo    VARCHAR(150),
-                telefono  VARCHAR(20),
-                creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            CREATE TABLE estudiantes (
+                id         SERIAL PRIMARY KEY,
+                cedula     VARCHAR(20) UNIQUE NOT NULL,
+                nombres    VARCHAR(150) NOT NULL,
+                apellidos  VARCHAR(150) NOT NULL,
+                correo     VARCHAR(150),
+                carrera    VARCHAR(150) NOT NULL,
+                semestre   VARCHAR(50) NOT NULL,
+                contrasena VARCHAR(255),
+                creado_en  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
-        console.log('✅ Tabla "estudiantes" creada o ya existía.');
+        console.log('✅ Tabla "estudiantes" re-creada con estructura para Excel.');
 
-        // ---- PASO 1.7: Crear la tabla estudiante_formatos ----
+        // ---- PASO 1.7: Re-crear la tabla estudiante_formatos ----
         // Vincula un formato específico a un estudiante
         await pool.query(`
             CREATE TABLE IF NOT EXISTS estudiante_formatos (
@@ -72,10 +100,40 @@ const inicializarBaseDatos = async () => {
                 estudiante_id  INTEGER REFERENCES estudiantes(id) ON DELETE CASCADE,
                 formato_id     INTEGER REFERENCES formatos(id) ON DELETE CASCADE,
                 observacion    TEXT,
+                estudiante_enterado BOOLEAN DEFAULT FALSE,
                 asignado_en    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
-        console.log('✅ Tabla "estudiante_formatos" creada o ya existía.');
+        console.log('✅ Tabla "estudiante_formatos" re-creada.');
+
+        // ---- PASO 1.8: Crear tabla alertas_tempranas ----
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS alertas_tempranas (
+                id             SERIAL PRIMARY KEY,
+                estudiante_id  INTEGER REFERENCES estudiantes(id) ON DELETE CASCADE,
+                docente_id     INTEGER REFERENCES usuarios(id) ON DELETE SET NULL,
+                materia        VARCHAR(150),
+                tipo_riesgo    VARCHAR(100),
+                observacion    TEXT,
+                estado         VARCHAR(50) DEFAULT 'Pendiente',
+                estudiante_enterado BOOLEAN DEFAULT FALSE,
+                fecha_reporte  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('✅ Tabla "alertas_tempranas" re-creada/existente.');
+
+        // ---- PASO 1.9: Crear tabla historial_intervenciones ----
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS historial_intervenciones (
+                id             SERIAL PRIMARY KEY,
+                estudiante_id  INTEGER REFERENCES estudiantes(id) ON DELETE CASCADE,
+                usuario_id     INTEGER REFERENCES usuarios(id) ON DELETE SET NULL,
+                accion         VARCHAR(255) NOT NULL,
+                descripcion    TEXT,
+                fecha          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('✅ Tabla "historial_intervenciones" re-creada/existente.');
 
         // ---- PASO 2: Hashear la contraseña con bcrypt ----
         // 10 rondas de sal — balance entre seguridad y velocidad

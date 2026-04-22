@@ -1,0 +1,18 @@
+# Dependencias
+node_modules/
+dist/
+build/
+
+# Variables de entorno
+.env
+.env.local
+.env.*.local
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Otros
+almacenamiento/
+*.docx
+temp/

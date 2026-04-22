@@ -34,8 +34,44 @@ const obtenerPorId = async (id) => {
     return resultado.rows[0];
 };
 
+// Registra un nuevo formato vacío (sin archivo inicial)
+const crear = async (nombre, modulo) => {
+    const resultado = await pool.query(
+        'INSERT INTO formatos (nombre, modulo) VALUES ($1, $2) RETURNING *',
+        [nombre, modulo]
+    );
+    return resultado.rows[0];
+};
+
+// Vincula un formato a un estudiante guardando las respuestas del Wizard (Bitácora)
+const vincularConRespuestas = async (asignacionId, respuestas) => {
+    const resultado = await pool.query(
+        `UPDATE estudiante_formatos 
+         SET respuestas_json = $1, finalizado_en = CURRENT_TIMESTAMP
+         WHERE id = $2
+         RETURNING *`,
+        [JSON.stringify(respuestas), asignacionId]
+    );
+    return resultado.rows[0];
+};
+
+// Guarda respuestas del asistente sin marcar como documento final generado
+const guardarRespuestasParciales = async (asignacionId, respuestas) => {
+    const resultado = await pool.query(
+        `UPDATE estudiante_formatos 
+         SET respuestas_json = $1
+         WHERE id = $2
+         RETURNING *`,
+        [JSON.stringify(respuestas), asignacionId]
+    );
+    return resultado.rows[0];
+};
+
 module.exports = {
     obtenerTodos,
     guardarArchivo,
-    obtenerPorId
+    obtenerPorId,
+    crear,
+    vincularConRespuestas,
+    guardarRespuestasParciales
 };

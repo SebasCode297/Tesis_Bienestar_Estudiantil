@@ -51,4 +51,16 @@ router.get('/:id/descargar', verificarSesion, formatosControlador.descargarDocum
 // GET /bienestar/api/formatos/:id/ver - Abre el archivo en el navegador (inline)
 router.get('/:id/ver', verificarSesion, formatosControlador.verDocumento);
 
+// POST /bienestar/api/formatos/nuevo - Crea un nuevo registro de formato
+router.post('/nuevo', verificarSesion, formatosControlador.crearFormato);
+
+// GET /bienestar/api/formatos/:id/campos - Obtiene los campos manuales definidos para el wizard
+router.get('/:id/campos', verificarSesion, formatosControlador.obtenerCampos);
+
+// POST /bienestar/api/formatos/generar - Procesa los datos del wizard y genera el .docx
+router.post('/generar', verificarSesion, formatosControlador.generarDocumento);
+
+// POST /bienestar/api/formatos/guardar-wizard - Guarda respuestas sin generar archivo
+router.post('/guardar-wizard', verificarSesion, formatosControlador.guardarWizard);
+
 module.exports = router;
