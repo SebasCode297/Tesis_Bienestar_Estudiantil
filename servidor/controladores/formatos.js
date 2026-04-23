@@ -10,13 +10,21 @@ const listarFormatos = async (req, res) => {
     try {
         const formatos = await formatoModelo.obtenerTodos();
         
-        // Agrupamos en dos listas para facilitar el trabajo del frontend
-        const respuesta = {
-            beca: formatos.filter(f => f.modulo === 'beca'),
-            seguimiento: formatos.filter(f => f.modulo === 'seguimiento')
-        };
+        // Agrupamos en dos listas para facilitar el trabajo del frontend (vistas fijas)
+        const beca = formatos.filter(f => f.modulo && f.modulo.toLowerCase() === 'beca');
+        const seguimiento = formatos.filter(f => f.modulo && f.modulo.toLowerCase() === 'seguimiento');
         
-        res.json({ exito: true, datos: respuesta });
+        // Otros: para no perder documentos que tengan un módulo mal escrito o diferente
+        const otros = formatos.filter(f => {
+            const m = (f.modulo || '').toLowerCase();
+            return m !== 'beca' && m !== 'seguimiento';
+        });
+
+        res.json({ 
+            exito: true, 
+            datos: { beca, seguimiento, otros },
+            total: formatos.length
+        });
     } catch (error) {
         console.error('Error al listar formatos:', error);
         res.status(500).json({ exito: false, mensaje: 'Error al obtener formatos' });
