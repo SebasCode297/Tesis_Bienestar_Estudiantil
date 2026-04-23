@@ -23,8 +23,7 @@
         </div>
         
         <ul class="sidebar__menu">
-            <li><a href="#" class="activo" onclick="cambiarVista('formatos', this)">Formatos del Sistema</a></li>
-            <li><a href="#" onclick="cambiarVista('alertas', this)">Alertas y Seguimiento</a></li>
+            <li><a href="#" class="activo" onclick="cambiarVista('alertas', this)">Alertas y Seguimiento</a></li>
             <li><a href="#" onclick="cambiarVista('estudiantes', this)">Estudiantes</a></li>
             <li><a href="#" onclick="cambiarVista('reportes', this)">Reportes</a></li>
             <li><a href="#" onclick="cambiarVista('configuracion', this)">Configuración</a></li>
@@ -43,7 +42,7 @@
     <main class="contenido">
         <header class="header-top">
             <button class="toggle-sidebar" id="toggle-sidebar" aria-label="Abrir menú">☰</button>
-            <h1 id="titulo-pagina">Gestión de Formatos</h1>
+            <h1 id="titulo-pagina">Alertas y Seguimiento</h1>
             <span id="badge-alertas-pendientes" style="display:none; background:#e53e3e; color:white; font-size:0.78rem; font-weight:700; padding:4px 12px; border-radius:20px; margin-left:15px;"></span>
         </header>
 
@@ -52,7 +51,7 @@
             <!-- =============================================
                  VISTA ALERTAS: BANDEJA DE ALERTAS Y SEGUIMIENTO
                  ============================================= -->
-            <div id="vista-alertas" style="display:none;">
+            <div id="vista-alertas">
 
                 <!-- FILTROS -->
                 <section class="modulo" style="margin-bottom:20px;">
@@ -108,82 +107,6 @@
                 </section>
             </div>
 
-            <!-- =============================================
-                 VISTA 1: FORMATOS DEL SISTEMA
-                 ============================================= -->
-            <div id="vista-formatos">
-                <!-- MÓDULO BECA -->
-                <section class="modulo" id="modulo-beca">
-                    <div class="modulo__header">
-                        <h2>Módulo: Formatos de Beca</h2>
-                        <button class="btn-anadir" onclick="abrirModalCrearFormato('beca')">Añadir Formato</button> <!-- Botón sin el símbolo de suma -->
-                    </div>
-                    <div class="modulo__body">
-                        <div class="formatos-grid" id="grid-beca">
-                            <div style="text-align:center;width:100%;padding:20px;color:#888;">Cargando...</div>
-                        </div>
-                    </div>
-                </section>
-                <!-- MÓDULO SEGUIMIENTO -->
-                <section class="modulo" id="modulo-seguimiento">
-                    <div class="modulo__header">
-                        <h2>Módulo: Seguimiento y Acompañamiento Estudiantil</h2>
-                        <button class="btn-anadir" onclick="abrirModalCrearFormato('seguimiento')">Añadir Formato</button> <!-- Botón de seguimiento sin símbolo -->
-                    </div>
-                    <div class="modulo__body">
-                        <div class="formatos-grid" id="grid-seguimiento"></div>
-                    </div>
-                </section>
-                <!-- VISOR DE DOCUMENTO (oculto) -->
-                <section class="modulo visor" id="visor-documento" style="display:none;">
-                    <div class="modulo__header visor__header">
-                        <button class="btn-volver" onclick="cerrarVisor()">Volver a formatos</button> <!-- Botón sin flecha -->
-                        <h2 id="visor-titulo">Documento</h2>
-                    </div>
-                    <div class="modulo__body visor__body">
-                        <div id="visor-cargando" style="text-align:center;padding:40px;color:#888;">Cargando documento...</div>
-                        <div id="visor-contenido" class="visor__contenido"></div>
-                    </div>
-                </section>
-
-                <!-- MODAL: CREAR NUEVO FORMATO -->
-                <div id="modal-nuevo-formato" class="modal-overlay" onclick="cerrarModalNuevoFormato(event)">
-                    <div class="modal-content" style="max-width: 450px;">
-                        <div class="modal-header">
-                            <h2 id="modal-nuevo-titulo">Añadir Nuevo documento</h2>
-                            <span class="modal-close" onclick="cerrarModalNuevoFormato()">Cerrar</span> <!-- Texto en lugar de símbolo de equis -->
-                        </div>
-                        <div class="modal-body">
-                            <div class="campo" style="margin-bottom:20px;">
-                                <label for="nuevo-nombre-formato">Nombre del Documento:</label>
-                                <input type="text" id="nuevo-nombre-formato" class="input-buscar" placeholder="Ej: ANEXO 3 - DECLARACIÓN" style="width:100%; margin-top:8px;">
-                                <input type="hidden" id="nuevo-modulo-formato">
-                            </div>
-                            <div style="display:flex; gap:10px; justify-content:flex-end;">
-                                <button class="btn btn--outline" onclick="cerrarModalNuevoFormato()">Cancelar</button>
-                                <button class="btn btn--primario" onclick="guardarNuevoFormato()">Guardar Formato</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- MODAL DE DETALLE DEL FORMATO -->
-                <div class="modal-overlay" id="modal-formato" onclick="cerrarModalFormato(event)">
-                    <div class="modal-content" onclick="event.stopPropagation()">
-                        <div class="modal-header">
-                            <h2 id="modal-formato-titulo">Nombre Formato</h2>
-                            <button class="modal-btn-cerrar" onclick="cerrarModalFormato()">Cerrar</button> <!-- Botón de cerrar con texto -->
-                        </div>
-                        <div class="modal-body">
-                            <div class="modal-desc">
-                                <strong>¿Para qué sirve?</strong><br>
-                                <span id="modal-formato-desc">Descripción del formato...</span>
-                            </div>
-                            <!-- Aquí se moverán dinámicamente los botones de acción de ese formato -->
-                            <div id="modal-formato-acciones" style="display:flex;gap:10px;align-items:center;background:#f8faff;padding:16px;border:1px dashed #b1b5cc;border-radius:8px;"></div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- =============================================
@@ -555,7 +478,7 @@
         // Carga la información del usuario al iniciar
         document.addEventListener('DOMContentLoaded', () => {
             cargarSesion();
-            cargarFormatos();
+            cargarAlertas(); // Carga la bandeja de alertas por defecto
             precargarBadgeAlertas(); // Muestra el contador de alertas pendientes en el header
         });
 
@@ -581,7 +504,6 @@
         // Cambia entre las 3 vistas sin recargar página
         // =============================================
         const titulos = {
-            formatos:      'Gestión de Formatos',
             alertas:       'Alertas y Seguimiento de Casos',
             estudiantes:   'Gestión de Estudiantes',
             reportes:      'Reportes y Estadísticas',
@@ -590,7 +512,7 @@
 
         function cambiarVista(vista, elemento) {
             // Oculta todas las vistas
-            ['formatos','alertas','estudiantes','reportes','configuracion'].forEach(v => {
+            ['alertas','estudiantes','reportes','configuracion'].forEach(v => {
                 const el = document.getElementById('vista-' + v);
                 if (el) el.style.display = 'none';
             });
@@ -604,7 +526,6 @@
             elemento.classList.add('activo');
 
             // Carga los datos de la vista seleccionada
-            if (vista === 'formatos')    cargarFormatos();
             if (vista === 'alertas')     cargarAlertas();
             if (vista === 'estudiantes')   cargarEstudiantes();
             if (vista === 'reportes')      cargarReportes();
@@ -711,196 +632,6 @@
                     alert('Error al cambiar estado: ' + d.mensaje);
                 }
             } catch(e) {
-                alert('Error de conexión al actualizar estado.');
-            }
-        }
-
-        // =============================================
-        // VISTA 1: FORMATOS
-        // =============================================
-
-        async function cargarFormatos() {
-            try {
-                const resp = await fetch('/bienestar/api/formatos');
-                if (resp.redirected) { window.location.href = resp.url; return; }
-                const datos = await resp.json();
-                if (datos.exito) {
-                    renderizarTarjetas('grid-beca', datos.datos.beca);
-                    renderizarTarjetas('grid-seguimiento', datos.datos.seguimiento);
-                }
-            } catch (e) { console.error('Error al cargar formatos:', e); }
-        }
-
-        // Diccionario de descripciones informativas para el personal
-        const descripcionesFormatos = {
-            'ANEXO 1 - OFICIO': 'Carta formal y protocolaria mediante la cual se inicia o se respalda el trámite de solicitud de beca ante las autoridades del Instituto.',
-            'ANEXO 2 - SOLICITUD': 'Formulario directo donde el estudiante expone los motivos y solicita formalmente ingresar al programa de becas.',
-            'FICHA SOCIOECONÓMICA': 'Documento clave que recopila los datos de ingresos, vivienda y situación familiar del estudiante para determinar si cumple con requisitos de vulnerabilidad.',
-            'ACTA DE REUNIÓN U.B.I.': 'Registro oficial para asentar los temas tratados, asistentes y decisiones tomadas en reuniones de la Unidad de Bienestar Institucional.',
-            'FICHA ACUERDO-COMPROMISO': 'Acta oficial donde el estudiante firma comprometiéndose a mejorar su desempeño académico o comportamiento tras una intervención.',
-            'FICHA DE ACOMPAÑAMIENTO - Formato': 'Bitácora estándar para registrar el progreso y seguimiento periódico de un estudiante que recibe ayuda psicológica o pedagógica.',
-            'FICHA DE JUSTIFICACIÓN DE FALTAS': 'Formato para estudiantes para justificar inasistencias por motivos médicos o personales, requiriendo adjuntar certificados.',
-            'FORMATO - FICHA DE SOLICITUD DE ATENCIÓN': 'Documento para que el docente o estudiante solicite formalmente atención psicológica, médica o académica al departamento.',
-            'FORMATO - INFORME DE SEGUIMIENTO DE ACOMPAÑAMIENTO Y CONTROL PEDAGÓGICO-DOCENTES': 'Reporte que el docente devuelve a Bienestar indicando si el alumno mejoró o empeoró tras habérsele generado una Alerta Temprana.',
-            'INFORME DE BIENESTAR ESTUDIANTIL': 'Reporte consolidado sobre la situación integral del alumno (perfil psicológico, social y académico) para presentarlo a autoridades.',
-            'INFORME DE CIERRE DEL PROCESO DE ACOMPAÑAMIENTO': 'Documento que certifica el final de la intervención ("alta" del caso), indicando que el estudiante superó la dificultad o alerta reportada.',
-            'REGISTRO DE ATENCIÓN A ESTUDIANTES': 'Bitácora general para contabilizar y llevar control diario de cuántos estudiantes acuden al departamento y por qué motivos.',
-            'REGISTRO DE DESERCIÓN': 'Documento legal para formalizar y registrar las causas por las que un estudiante abandona y se retira definitivamente del Instituto.',
-            'SOLICITUD ESTUDIANTE-CONVENIO': 'Formato para gestionar trámites de estudiantes que aplican a prácticas, pasantías o que estudian amparados bajo un convenio interinstitucional.'
-        };
-
-        function renderizarTarjetas(idGrid, formatos) {
-            const grid = document.getElementById(idGrid);
-            grid.innerHTML = '';
-            
-            // Solo mostramos los formatos marcados como activos
-            const activos = formatos.filter(f => f.activo !== false);
-
-            if (!activos.length) {
-                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#888;">No hay formatos activos en este módulo.</div>';
-                return;
-            }
-
-            activos.forEach(f => {
-                const tieneArchivo = !!f.archivo_ruta;
-                // Usamos la descripción de la BD si existe, sino el fallback del objeto superior
-                const descripcion = f.descripcion || descripcionesFormatos[f.nombre] || 'Plantilla de documento estándar del Sistema de Bienestar Estudiantil.';
-                
-                // Construirmos la tarjeta
-                const tarjeta = document.createElement('div');
-                tarjeta.className = 'tarjeta-formato';
-                
-                const estadoHTML = tieneArchivo 
-                    ? '<span class="estado estado--subido">Documento Cargado</span>' 
-                    : '<span class="estado estado--pendiente">Plantilla Pendiente</span>'; 
-
-                // Guardamos el botón de visor para inyectarlo en el modal
-                const btnVisor = tieneArchivo ? `<button type="button" class="btn btn--outline" onclick="abrirVisor(${f.id}, '${f.nombre}'); cerrarModalFormato();">Visualizar</button>` : '';
-                const formHTML = `
-                    <form class="form-subida" onsubmit="event.preventDefault()">
-                        <label class="btn btn--primario" for="file-modal-${f.id}">${tieneArchivo ? 'Actualizar Archivo' : 'Subir Plantilla Inicial'}</label>
-                        <input type="file" id="file-modal-${f.id}" class="input-file" accept=".pdf,.doc,.docx" onchange="subirArchivo(${f.id}, this)">
-                        <span id="progreso-${f.id}" class="nombre-archivo-sel"></span>
-                        ${btnVisor}
-                    </form>`;
-
-                tarjeta.innerHTML = `
-                    <div>
-                        <div class="tarjeta-formato__header">
-                            <h3>${f.nombre}</h3>
-                        </div>
-                        <div class="tarjeta-formato__desc">${descripcion}</div>
-                    </div>
-                    <div class="tarjeta-formato__footer">
-                        <div class="tarjeta-formato__estado">${estadoHTML}</div>
-                        <span style="font-size:0.75rem;color:var(--azul-marino);font-weight:600;">Gestionar</span> 
-                    </div>
-                `;
-
-                // Configurar el evento onClick para abrir el modal
-                tarjeta.addEventListener('click', () => {
-                    abrirModalFormato(f.nombre, descripcion, formHTML);
-                });
-
-                grid.appendChild(tarjeta);
-            });
-        }
-
-        function abrirModalFormato(titulo, descripcion, accionesHTML) {
-            document.getElementById('modal-formato-titulo').textContent = titulo;
-            document.getElementById('modal-formato-desc').textContent = descripcion;
-            document.getElementById('modal-formato-acciones').innerHTML = accionesHTML;
-            document.getElementById('modal-formato').classList.add('activo');
-        }
-
-        function cerrarModalFormato(e) {
-            if (e && e.target !== document.getElementById('modal-formato')) return; // Solo si clic afuera
-            document.getElementById('modal-formato').classList.remove('activo');
-        }
-
-        // --- LÓGICA PARA CREAR NUEVOS FORMATOS ---
-        function abrirModalCrearFormato(modulo) {
-            document.getElementById('nuevo-modulo-formato').value = modulo;
-            const tituloText = (modulo === 'beca') ? 'Añadir Formato de Beca' : 'Añadir Formato de Seguimiento';
-            document.getElementById('modal-nuevo-titulo').textContent = tituloText;
-            document.getElementById('nuevo-nombre-formato').value = '';
-            document.getElementById('modal-nuevo-formato').classList.add('activo');
-        }
-
-        function cerrarModalNuevoFormato(e) {
-            if (e && e.target !== document.getElementById('modal-nuevo-formato') && e.target.className !== 'modal-close') return;
-            document.getElementById('modal-nuevo-formato').classList.remove('activo');
-        }
-
-        async function guardarNuevoFormato() {
-            const nombre = document.getElementById('nuevo-nombre-formato').value.trim();
-            const modulo = document.getElementById('nuevo-modulo-formato').value;
-            
-            if (!nombre) {
-                alert('Por favor, ingresa el nombre del nuevo formato.');
-                return;
-            }
-
-            try {
-                const response = await fetch('/bienestar/api/formatos/nuevo', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nombre, modulo })
-                });
-
-                const data = await response.json();
-                if (data.exito) {
-                    document.getElementById('modal-nuevo-formato').classList.remove('activo');
-                    cargarFormatos(); // Recarga la cuadrícula
-                } else {
-                    alert('Error al crear el formato: ' + (data.mensaje || 'Error desconocido'));
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error de conexión al servidor.');
-            }
-        }
-
-        async function subirArchivo(id, input) {
-            const file = input.files[0]; if (!file) return;
-            const span = document.getElementById(`progreso-${id}`);
-            span.textContent = 'Subiendo...';
-            const fd = new FormData(); fd.append('documento', file);
-            try {
-                const r = await fetch(`/bienestar/api/formatos/${id}/subir`, { method:'POST', body:fd });
-                const d = await r.json();
-                if (d.exito) { span.style.color='var(--exito)'; span.textContent='¡Cargado!'; setTimeout(cargarFormatos,1000); }
-                else { span.style.color='#c0392b'; span.textContent='Error.'; }
-            } catch(e) { span.style.color='#c0392b'; span.textContent='Error de red.'; }
-            input.value = '';
-        }
-
-        // Visor de documentos Word → HTML
-        async function abrirVisor(id, nombre) {
-            document.getElementById('modulo-beca').style.display = 'none';
-            document.getElementById('modulo-seguimiento').style.display = 'none';
-            const visor = document.getElementById('visor-documento');
-            visor.style.display = 'block';
-            document.getElementById('visor-titulo').textContent = nombre;
-            document.getElementById('visor-cargando').style.display = 'block';
-            document.getElementById('visor-contenido').innerHTML = '';
-            try {
-                const blob = await (await fetch(`/bienestar/api/formatos/${id}/ver`)).blob();
-                const ab = await blob.arrayBuffer();
-                const res = await mammoth.convertToHtml({ arrayBuffer: ab });
-                document.getElementById('visor-cargando').style.display = 'none';
-                document.getElementById('visor-contenido').innerHTML = res.value;
-            } catch(e) {
-                document.getElementById('visor-cargando').style.display = 'none';
-                document.getElementById('visor-contenido').innerHTML = '<p style="color:#c0392b;text-align:center;">No se pudo cargar. Verifica que sea .docx</p>';
-            }
-        }
-        function cerrarVisor() {
-            document.getElementById('visor-documento').style.display = 'none';
-            document.getElementById('modulo-beca').style.display = 'block';
-            document.getElementById('modulo-seguimiento').style.display = 'block';
-        }
-
         // =============================================
         // VISTA 2: ESTUDIANTES
         // =============================================
