@@ -78,7 +78,10 @@
                 <section class="modulo">
                     <div class="modulo__header" style="display:flex;justify-content:space-between;align-items:center;">
                         <h2>Bandeja de Alertas Recibidas</h2>
-                        <span id="contador-alertas" style="font-size:0.9rem;color:#555;"></span>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <span id="contador-alertas" style="font-size:0.9rem;color:#555;"></span>
+                            <button class="btn btn--primario" onclick="abrirModalRegistroAlerta()">+ Registrar Informe de Docente</button>
+                        </div>
                     </div>
                     <div class="modulo__body">
                         <div style="overflow-x:auto;">
@@ -390,6 +393,55 @@
         </div>
     </div>
 
+    <!-- MODAL DE REGISTRO DE ALERTA (BIENESTAR REGISTRA INFORME DOCENTE) -->
+    <div id="modal-registro-alerta" class="modal-overlay" onclick="cerrarModalRegistroAlerta(event)">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h2>Registrar Informe Recibido</h2>
+                <span class="modal-close" onclick="cerrarModalRegistroAlerta()">Cerrar</span>
+            </div>
+            <div class="modal-body">
+                <form id="form-registro-alerta" onsubmit="enviarRegistroAlerta(event)">
+                    <div class="campo" style="margin-bottom:15px;">
+                        <label>Estudiante (Seleccionar de la lista):</label>
+                        <select id="reg-alerta-estudiante" class="input-buscar" style="width:100%; margin-top:5px; height:40px;" required>
+                            <option value="">Cargando estudiantes...</option>
+                        </select>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                        <div class="campo">
+                            <label>Asignatura/Materia:</label>
+                            <input type="text" id="reg-alerta-materia" class="input-buscar" style="width:100%; margin-top:5px;" placeholder="Ej: Programación II" required>
+                        </div>
+                        <div class="campo">
+                            <label>Tipo de Riesgo:</label>
+                            <select id="reg-alerta-riesgo" class="input-buscar" style="width:100%; margin-top:5px;">
+                                <option value="Académico">Riesgo Académico</option>
+                                <option value="Psicológico">Riesgo Psicológico</option>
+                                <option value="Socioeconómico">Riesgo Socioeconómico</option>
+                                <option value="Comportamiento">Comportamiento</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="campo" style="margin-bottom:15px;">
+                        <label>Observación corta:</label>
+                        <input type="text" id="reg-alerta-observacion" class="input-buscar" style="width:100%; margin-top:5px;" placeholder="Ej: El docente reporta bajo rendimiento.">
+                    </div>
+                    <div class="campo" style="margin-bottom:20px;">
+                        <label>Subir Informe/Evidencia (Docente):</label>
+                        <input type="file" id="reg-alerta-archivo" class="input-buscar" style="width:100%; margin-top:5px;" accept=".pdf,.doc,.docx,.jpg,.png">
+                        <small style="color:#666;">Selecciona el archivo digital que te entregó el docente.</small>
+                    </div>
+                    <div style="display:flex; gap:10px; justify-content:flex-end;">
+                        <button type="button" class="btn btn--outline" onclick="cerrarModalRegistroAlerta()">Cancelar</button>
+                        <button type="submit" class="btn btn--primario" id="btn-guardar-reg-alerta">Guardar Registro</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- =============================================
          WIZARD MODAL (Asistente de Llenado)
          ============================================= -->
@@ -618,13 +670,18 @@
                     ? '<span style="background:#dcfce7;color:#166534;padding:3px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;">Enterado</span>'
                     : '<span style="background:#fee2e2;color:#991b1b;padding:3px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;">No enterado</span>';
 
+                // Link al archivo adjunto (si existe)
+                const linkInforme = a.archivo_docente_ruta 
+                    ? `<a href="/almacenamiento/${a.archivo_docente_nombre}" target="_blank" style="color:var(--azul-marino); font-size:0.75rem; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:5px;"><span style="font-size:1.1rem;">📂</span> Ver Informe</a>`
+                    : '<span style="color:#aaa; font-size:0.75rem;">Sin archivo</span>';
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td style="white-space:nowrap;font-size:0.85rem;">${fecha}</td>
                     <td><strong>${a.estudiante_apellidos} ${a.estudiante_nombres}</strong><br><span style="font-size:0.78rem;color:#888;">${a.estudiante_cedula}</span></td>
                     <td style="font-size:0.85rem;">${a.estudiante_carrera}<br><em>${a.estudiante_semestre}</em></td>
                     <td style="font-size:0.82rem;">${a.docente_correo ? a.docente_correo.split('@')[0] : '—'}</td>
-                    <td style="font-size:0.85rem;">${a.materia}</td>
+                    <td style="font-size:0.85rem;">${a.materia}<br>${linkInforme}</td>
                     <td><span style="background:#f3f4f6;padding:4px 8px;border-radius:4px;font-size:0.8rem;">${a.tipo_riesgo}</span></td>
                     <td>${enterado}</td>
                     <td><span style="background:${estilo.bg};color:${estilo.color};padding:4px 10px;border-radius:4px;font-size:0.78rem;font-weight:700;">${a.estado}</span></td>
@@ -1657,6 +1714,79 @@
             }
         }
 
+        // =============================================
+        // LÓGICA DE REGISTRO DE ALERTA EXTERNA
+        // =============================================
+        async function abrirModalRegistroAlerta() {
+            const select = document.getElementById('reg-alerta-estudiante');
+            select.innerHTML = '<option value="">Cargando estudiantes...</option>';
+            document.getElementById('modal-registro-alerta').classList.add('activo');
+
+            try {
+                // Necesitamos todos los estudiantes para el dropdown
+                const r = await fetch('/bienestar/api/estudiantes/buscar?q=');
+                const d = await r.json();
+                if (d.exito) {
+                    select.innerHTML = '<option value="">-- Selecciona un estudiante --</option>';
+                    d.datos.forEach(e => {
+                        const opt = document.createElement('option');
+                        opt.value = e.id;
+                        opt.textContent = `${e.apellidos} ${e.nombres} (${e.cedula})`;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch(e) {
+                select.innerHTML = '<option value="">Error al cargar estudiantes</option>';
+            }
+        }
+
+        function cerrarModalRegistroAlerta(e) {
+            if (e && e.target !== document.getElementById('modal-registro-alerta') && e.target.className !== 'modal-close') return;
+            document.getElementById('modal-registro-alerta').classList.remove('activo');
+            document.getElementById('form-registro-alerta').reset();
+        }
+
+        async function enviarRegistroAlerta(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-guardar-reg-alerta');
+            btn.disabled = true;
+            btn.textContent = 'Guardando...';
+
+            const formData = new FormData();
+            formData.append('estudianteId', document.getElementById('reg-alerta-estudiante').value);
+            formData.append('materia',      document.getElementById('reg-alerta-materia').value);
+            formData.append('tipoRiesgo',   document.getElementById('reg-alerta-riesgo').value);
+            formData.append('observacion',  document.getElementById('reg-alerta-observacion').value);
+            
+            const fileInput = document.getElementById('reg-alerta-archivo');
+            if (fileInput.files[0]) {
+                formData.append('archivo', fileInput.files[0]);
+            }
+
+            try {
+                const r = await fetch('/bienestar/api/alertas/registrar-externo', {
+                    method: 'POST',
+                    body: formData
+                });
+                const d = await r.json();
+                
+                if (d.exito) {
+                    alert('Informe registrado exitosamente.');
+                    cerrarModalRegistroAlerta();
+                    if (document.getElementById('vista-alertas').style.display !== 'none') {
+                        cargarAlertas();
+                    }
+                } else {
+                    alert('Error: ' + d.mensaje);
+                }
+            } catch(err) {
+                console.error(err);
+                alert('No se pudo conectar con el servidor.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Guardar Registro';
+            }
+        }
     </script>
 </body>
 </html>

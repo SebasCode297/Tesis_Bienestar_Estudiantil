@@ -29,8 +29,10 @@ app.set('trust proxy', 1);
 // =============================================
 
 // Sirve los archivos estáticos de la capa de presentación
-// 'cliente/' contiene todos los HTML, CSS e imágenes del frontend
 app.use(express.static(path.join(__dirname, '..', 'cliente')));
+
+// Sirve los archivos subidos (informes, plantillas)
+app.use('/almacenamiento', express.static(path.join(__dirname, '..', 'almacenamiento')));
 
 // Permite que Express entienda JSON en el cuerpo de las solicitudes
 app.use(express.json());

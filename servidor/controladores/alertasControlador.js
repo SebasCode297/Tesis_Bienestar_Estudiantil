@@ -25,7 +25,9 @@ const listarAlertas = async (req, res) => {
                 e.cedula        AS estudiante_cedula,
                 e.carrera       AS estudiante_carrera,
                 e.semestre      AS estudiante_semestre,
-                u.correo        AS docente_correo
+                u.correo        AS docente_correo,
+                a.archivo_docente_nombre,
+                a.archivo_docente_ruta
             FROM alertas_tempranas a
             JOIN estudiantes e ON a.estudiante_id = e.id
             LEFT JOIN usuarios u ON a.docente_id = u.id
@@ -152,9 +154,44 @@ const alertasPorEstudiante = async (req, res) => {
     }
 };
 
+// =============================================
+// REGISTRO DE ALERTA EXTERNA (Bienestar)
+// =============================================
+const crearAlertaExterna = async (req, res) => {
+    try {
+        const { estudianteId, materia, tipoRiesgo, observacion } = req.body;
+        
+        // El archivo viene cargado por multer si se envió sustento
+        const archivoNombre = req.file ? req.file.filename : null;
+        const archivoRuta = req.file ? req.file.path : null;
+
+        const consulta = `
+            INSERT INTO alertas_tempranas 
+                (estudiante_id, docente_id, materia, tipo_riesgo, observacion, archivo_docente_nombre, archivo_docente_ruta)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING *
+        `;
+
+        // docente_id es NULL porque es un registro manual de Bienestar desde un informe externo
+        const params = [estudianteId, null, materia, tipoRiesgo, observacion, archivoNombre, archivoRuta];
+        const resultado = await pool.query(consulta, params);
+
+        res.json({ 
+            exito: true, 
+            mensaje: 'Informe docente registrado correctamente en el sistema.',
+            datos: resultado.rows[0] 
+        });
+
+    } catch (error) {
+        console.error('Error al registrar alerta externa:', error);
+        res.status(500).json({ exito: false, mensaje: 'Error al procesar el registro del informe' });
+    }
+};
+
 module.exports = {
     listarAlertas,
     cambiarEstado,
     estadisticasAlertas,
-    alertasPorEstudiante
+    alertasPorEstudiante,
+    crearAlertaExterna
 };
