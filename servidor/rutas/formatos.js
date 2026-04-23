@@ -63,4 +63,10 @@ router.post('/generar', verificarSesion, formatosControlador.generarDocumento);
 // POST /bienestar/api/formatos/guardar-wizard - Guarda respuestas sin generar archivo
 router.post('/guardar-wizard', verificarSesion, formatosControlador.guardarWizard);
 
+// PATCH /bienestar/api/formatos/:id - Actualiza metadatos del formato (Autogestión)
+router.patch('/:id', verificarSesion, formatosControlador.actualizarFormato);
+
+// DELETE /bienestar/api/formatos/:id - Elimina el formato y su archivo técnico
+router.delete('/:id', verificarSesion, formatosControlador.eliminarFormato);
+
 module.exports = router;

@@ -5,10 +5,10 @@
 
 const pool = require('../config/baseDatos');
 
-// Obtiene todos los formatos ordenados
+// Obtiene todos los formatos ordenados (incluyendo nuevos campos)
 const obtenerTodos = async () => {
     const resultado = await pool.query(
-        'SELECT * FROM formatos ORDER BY modulo ASC, id ASC'
+        'SELECT * FROM formatos ORDER BY modulo ASC, nombre ASC'
     );
     return resultado.rows;
 };
@@ -25,7 +25,7 @@ const guardarArchivo = async (idFormato, archivoNombre, archivoRuta) => {
     return resultado.rows[0];
 };
 
-// Obtiene un solo formato por su ID (para descarga)
+// Obtiene un solo formato por su ID
 const obtenerPorId = async (id) => {
     const resultado = await pool.query(
         'SELECT * FROM formatos WHERE id = $1',
@@ -34,11 +34,33 @@ const obtenerPorId = async (id) => {
     return resultado.rows[0];
 };
 
-// Registra un nuevo formato vacío (sin archivo inicial)
-const crear = async (nombre, modulo) => {
+// Registra un nuevo formato (ahora soporta descripción)
+const crear = async (nombre, modulo, descripcion = '') => {
     const resultado = await pool.query(
-        'INSERT INTO formatos (nombre, modulo) VALUES ($1, $2) RETURNING *',
-        [nombre, modulo]
+        'INSERT INTO formatos (nombre, modulo, descripcion) VALUES ($1, $2, $3) RETURNING *',
+        [nombre, modulo, descripcion]
+    );
+    return resultado.rows[0];
+};
+
+// Actualiza los datos de un formato (Autogestión)
+const actualizar = async (id, datos) => {
+    const { nombre, modulo, descripcion, activo } = datos;
+    const resultado = await pool.query(
+        `UPDATE formatos 
+         SET nombre = $1, modulo = $2, descripcion = $3, activo = $4
+         WHERE id = $5 
+         RETURNING *`,
+        [nombre, modulo, descripcion, activo, id]
+    );
+    return resultado.rows[0];
+};
+
+// Elimina un formato del sistema
+const eliminar = async (id) => {
+    const resultado = await pool.query(
+        'DELETE FROM formatos WHERE id = $1 RETURNING *',
+        [id]
     );
     return resultado.rows[0];
 };
@@ -72,6 +94,8 @@ module.exports = {
     guardarArchivo,
     obtenerPorId,
     crear,
+    actualizar,
+    eliminar,
     vincularConRespuestas,
     guardarRespuestasParciales
 };

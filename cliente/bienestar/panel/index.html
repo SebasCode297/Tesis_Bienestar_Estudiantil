@@ -27,6 +27,7 @@
             <li><a href="#" onclick="cambiarVista('alertas', this)">Alertas y Seguimiento</a></li>
             <li><a href="#" onclick="cambiarVista('estudiantes', this)">Estudiantes</a></li>
             <li><a href="#" onclick="cambiarVista('reportes', this)">Reportes</a></li>
+            <li><a href="#" onclick="cambiarVista('configuracion', this)">Configuración</a></li>
         </ul>
 
         <div class="sidebar__usuario">
@@ -291,10 +292,60 @@
 
                 <!-- Resumen de formatos -->
                 <section class="modulo">
-                    <div class="modulo__header"><h2>Resumen de Formatos del Sistema</h2></div>
+                    <div class="modulo__header"><h2>Eficacia Operativa: Gestión de Documentos</h2></div>
                     <div class="modulo__body">
                         <div class="resumen-formatos" id="resumen-formatos">
-                            <p>Cargando...</p>
+                            <p>Cargando reporte de formatos...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- NUEVA SECCIÓN: DISTRIBUCIÓN POR CARRERA Y RESOLUCIÓN -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:20px;">
+                    <section class="modulo">
+                        <div class="modulo__header"><h2>Distribución por Carrera</h2></div>
+                        <div class="modulo__body" id="container-carreras">
+                            <p style="color:#888;">Cargando datos...</p>
+                        </div>
+                    </section>
+                    <section class="modulo">
+                        <div class="modulo__header"><h2>Efectividad de Alertas</h2></div>
+                        <div class="modulo__body" id="container-efectividad">
+                            <p style="color:#888;">Cargando datos...</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- =============================================
+                 VISTA 4: CONFIGURACIÓN DEL SISTEMA (NUEVA)
+                 ============================================= -->
+            <div id="vista-configuracion" style="display:none;">
+                
+                <section class="modulo">
+                    <div class="modulo__header" style="display:flex; justify-content:space-between; align-items:center;">
+                        <h2>Administración de Formatos Dinámicos</h2>
+                        <button class="btn btn--primario" onclick="abrirModalConfigFormato()">+ Nuevo Formato</button>
+                    </div>
+                    <div class="modulo__body">
+                        <p style="color:#666; margin-bottom:20px; font-size:0.9rem;">
+                            Desde aquí puedes gestionar los documentos que aparecen en el sistema. Puedes cambiarles el nombre, la categoría o actualizar el archivo Word.
+                        </p>
+                        <div style="overflow-x:auto;">
+                            <table class="tabla-formatos">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre del Documento</th>
+                                        <th>Módulo / Categoría</th>
+                                        <th>Descripción</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-config-formatos">
+                                    <tr><td colspan="5" style="text-align:center; padding:30px; color:#888;">Cargando configuración...</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </section>
@@ -302,6 +353,42 @@
 
         </div>
     </main>
+
+    <!-- MODAL DE CONFIGURACIÓN (Crear/Editar Formato) -->
+    <div id="modal-config-formato" class="modal-overlay" onclick="cerrarModalConfigFormato(event)">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="modal-config-titulo">Configurar Formato</h2>
+                <span class="modal-close" onclick="cerrarModalConfigFormato()">Cerrar</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="config-id-formato">
+                <div class="campo" style="margin-bottom:15px;">
+                    <label>Nombre del Documento:</label>
+                    <input type="text" id="config-nombre" class="input-buscar" style="width:100%; margin-top:5px;">
+                </div>
+                <div class="campo" style="margin-bottom:15px;">
+                    <label>Categoría / Módulo:</label>
+                    <select id="config-modulo" class="input-buscar" style="width:100%; margin-top:5px;">
+                        <option value="beca">Formatos de Beca</option>
+                        <option value="seguimiento">Seguimiento y Acompañamiento</option>
+                    </select>
+                </div>
+                <div class="campo" style="margin-bottom:15px;">
+                    <label>Descripción (¿Para qué sirve?):</label>
+                    <textarea id="config-descripcion" class="input-buscar" style="width:100%; margin-top:5px; height:80px; padding:10px; font-family:inherit;"></textarea>
+                </div>
+                <div class="campo" style="margin-bottom:20px; display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="config-activo" checked style="width:18px;height:18px;">
+                    <label for="config-activo">Formato habilitado en el sistema</label>
+                </div>
+                <div style="display:flex; gap:10px; justify-content:flex-end;">
+                    <button class="btn btn--outline" onclick="cerrarModalConfigFormato()">Cancelar</button>
+                    <button class="btn btn--primario" onclick="guardarCambiosConfig()">Guardar Configuración</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- =============================================
          WIZARD MODAL (Asistente de Llenado)
@@ -442,16 +529,18 @@
         // Cambia entre las 3 vistas sin recargar página
         // =============================================
         const titulos = {
-            formatos:    'Gestión de Formatos',
-            alertas:     'Alertas y Seguimiento de Casos',
-            estudiantes: 'Gestión de Estudiantes',
-            reportes:    'Reportes y Estadísticas'
+            formatos:      'Gestión de Formatos',
+            alertas:       'Alertas y Seguimiento de Casos',
+            estudiantes:   'Gestión de Estudiantes',
+            reportes:      'Reportes y Estadísticas',
+            configuracion: 'Configuración del Sistema'
         };
 
         function cambiarVista(vista, elemento) {
             // Oculta todas las vistas
-            ['formatos','alertas','estudiantes','reportes'].forEach(v => {
-                document.getElementById('vista-' + v).style.display = 'none';
+            ['formatos','alertas','estudiantes','reportes','configuracion'].forEach(v => {
+                const el = document.getElementById('vista-' + v);
+                if (el) el.style.display = 'none';
             });
 
             // Muestra la vista seleccionada
@@ -465,8 +554,9 @@
             // Carga los datos de la vista seleccionada
             if (vista === 'formatos')    cargarFormatos();
             if (vista === 'alertas')     cargarAlertas();
-            if (vista === 'estudiantes') cargarEstudiantes();
-            if (vista === 'reportes')    cargarReportes();
+            if (vista === 'estudiantes')   cargarEstudiantes();
+            if (vista === 'reportes')      cargarReportes();
+            if (vista === 'configuracion') cargarAdminFormatos();
         }
 
         // =============================================
@@ -606,22 +696,26 @@
             const grid = document.getElementById(idGrid);
             grid.innerHTML = '';
             
-            if (!formatos.length) {
-                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#888;">No hay formatos registrados en este módulo.</div>';
+            // Solo mostramos los formatos marcados como activos
+            const activos = formatos.filter(f => f.activo !== false);
+
+            if (!activos.length) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#888;">No hay formatos activos en este módulo.</div>';
                 return;
             }
 
-            formatos.forEach(f => {
+            activos.forEach(f => {
                 const tieneArchivo = !!f.archivo_ruta;
-                const descripcion = descripcionesFormatos[f.nombre] || 'Plantilla de documento estándar del Sistema de Bienestar Estudiantil.';
+                // Usamos la descripción de la BD si existe, sino el fallback del objeto superior
+                const descripcion = f.descripcion || descripcionesFormatos[f.nombre] || 'Plantilla de documento estándar del Sistema de Bienestar Estudiantil.';
                 
                 // Construirmos la tarjeta
                 const tarjeta = document.createElement('div');
                 tarjeta.className = 'tarjeta-formato';
                 
                 const estadoHTML = tieneArchivo 
-                    ? '<span class="estado estado--subido">Documento Cargado</span>' // Texto sin punto decorativo
-                    : '<span class="estado estado--pendiente">Plantilla Pendiente</span>'; // Texto sin círculo decorativo
+                    ? '<span class="estado estado--subido">Documento Cargado</span>' 
+                    : '<span class="estado estado--pendiente">Plantilla Pendiente</span>'; 
 
                 // Guardamos el botón de visor para inyectarlo en el modal
                 const btnVisor = tieneArchivo ? `<button type="button" class="btn btn--outline" onclick="abrirVisor(${f.id}, '${f.nombre}'); cerrarModalFormato();">Visualizar</button>` : '';
@@ -642,7 +736,7 @@
                     </div>
                     <div class="tarjeta-formato__footer">
                         <div class="tarjeta-formato__estado">${estadoHTML}</div>
-                        <span style="font-size:0.75rem;color:var(--azul-marino);font-weight:600;">Gestionar</span> <!-- Texto sin flecha decorativa -->
+                        <span style="font-size:0.75rem;color:var(--azul-marino);font-weight:600;">Gestionar</span> 
                     </div>
                 `;
 
@@ -1023,7 +1117,48 @@
                     document.getElementById('stat-estudiantes').textContent = de.datos.totalEstudiantes;
                     document.getElementById('stat-beca').textContent = de.datos.enBeca;
                     document.getElementById('stat-seguimiento').textContent = de.datos.enSeguimiento;
-                    document.getElementById('stat-asignaciones').textContent = de.datos.totalAsignaciones;
+                    document.getElementById('stat-asignaciones').textContent = de.datos.alertas.total;
+
+                    // Renderizar Distribución por Carrera
+                    const contCarreras = document.getElementById('container-carreras');
+                    if (de.datos.porCarrera && de.datos.porCarrera.length > 0) {
+                        let htmlCarreras = '<div class="resumen-barras">';
+                        const max = de.datos.porCarrera[0].cantidad;
+                        de.datos.porCarrera.forEach(c => {
+                            const pct = ((c.cantidad / max) * 100).toFixed(0);
+                            htmlCarreras += `
+                                <div class="resumen-item">
+                                    <span style="font-size:0.82rem;">${c.carrera} <strong>(${c.cantidad})</strong></span>
+                                    <div class="barra"><div class="barra-fill" style="width:${pct}%; background:var(--azul-marino);"></div></div>
+                                </div>`;
+                        });
+                        htmlCarreras += '</div>';
+                        contCarreras.innerHTML = htmlCarreras;
+                    } else {
+                        contCarreras.innerHTML = '<p style="color:#888; text-align:center; padding:20px;">Sin datos registrados.</p>';
+                    }
+
+                    // Renderizar Efectividad de Alertas
+                    const contEfec = document.getElementById('container-efectividad');
+                    const a = de.datos.alertas;
+                    const pctRes = a.total > 0 ? ((a.resueltas / a.total) * 100).toFixed(0) : 0;
+                    contEfec.innerHTML = `
+                        <div style="text-align:center; padding:10px 0;">
+                            <div style="font-size:3rem; font-weight:800; color:#22c55e;">${pctRes}%</div>
+                            <p style="font-weight:700; color:#4a5568; margin-bottom:20px;">Casos Resueltos con Éxito</p>
+                            
+                            <div class="resumen-barras">
+                                <div class="resumen-item">
+                                    <span>Pendientes: ${a.pendientes}</span>
+                                    <div class="barra"><div class="barra-fill" style="width:${a.total>0?(a.pendientes/a.total*100):0}%; background:#f59e0b;"></div></div>
+                                </div>
+                                <div class="resumen-item">
+                                    <span>En Proceso: ${a.en_proceso}</span>
+                                    <div class="barra"><div class="barra-fill" style="width:${a.total>0?(a.en_proceso/a.total*100):0}%; background:#3b82f6;"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
                 }
 
                 // Resumen de formatos
@@ -1389,6 +1524,139 @@
                 document.querySelector('.sidebar').classList.toggle('sidebar--abierta');
             });
         }
+        // =============================================
+        // VISTA 4: CONFIGURACIÓN (LÓGICA)
+        // =============================================
+        async function cargarAdminFormatos() {
+            const tbody = document.getElementById('tbody-config-formatos');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#888;">Cargando...</td></tr>';
+            try {
+                const r = await fetch('/bienestar/api/formatos');
+                const d = await r.json();
+                if (d.exito) {
+                    // Unimos las dos listas para la tabla de admin
+                    const todos = [...d.datos.beca, ...d.datos.seguimiento];
+                    renderizarTablaConfig(todos);
+                }
+            } catch(e) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#c0392b;">Error al conectar con el servidor.</td></tr>';
+            }
+        }
+
+        function renderizarTablaConfig(lista) {
+            const tbody = document.getElementById('tbody-config-formatos');
+            tbody.innerHTML = '';
+            if (lista.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#888;">No hay formatos registrados.</td></tr>';
+                return;
+            }
+
+            lista.forEach(f => {
+                const tr = document.createElement('tr');
+                const estado = f.activo 
+                    ? '<span style="color:#276749; background:#c6f6d5; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;">Activo</span>'
+                    : '<span style="color:#9b2c2c; background:#fed7d7; padding:3px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;">Inactivo</span>';
+
+                tr.innerHTML = `
+                    <td><strong>${f.nombre}</strong></td>
+                    <td style="text-transform: capitalize;">${f.modulo}</td>
+                    <td style="font-size:0.85rem; max-width:250px;">${f.descripcion || '<em style="color:#999;">Sin descripción</em>'}</td>
+                    <td>${estado}</td>
+                    <td>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn btn--outline" style="padding:6px 12px; font-size:0.8rem;" onclick='abrirModalConfigFormato(${JSON.stringify(f).replace(/'/g, "&apos;")})'>Editar</button>
+                            <button class="btn" style="padding:6px 12px; font-size:0.8rem; background:#fed7d7; color:#9b2c2c;" onclick="eliminarAdminFormato(${f.id}, '${f.nombre}')">Borrar</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function abrirModalConfigFormato(formato = null) {
+            const titulo = document.getElementById('modal-config-titulo');
+            const idInput = document.getElementById('config-id-formato');
+            const nombreInput = document.getElementById('config-nombre');
+            const moduloInput = document.getElementById('config-modulo');
+            const descInput = document.getElementById('config-descripcion');
+            const activoInput = document.getElementById('config-activo');
+
+            if (formato) {
+                titulo.textContent = 'Editar Formato';
+                idInput.value = formato.id;
+                nombreInput.value = formato.nombre;
+                moduloInput.value = formato.modulo;
+                descInput.value = formato.descripcion || '';
+                activoInput.checked = formato.activo !== false;
+            } else {
+                titulo.textContent = 'Nuevo Formato';
+                idInput.value = '';
+                nombreInput.value = '';
+                moduloInput.value = 'beca';
+                descInput.value = '';
+                activoInput.checked = true;
+            }
+
+            document.getElementById('modal-config-formato').classList.add('activo');
+        }
+
+        function cerrarModalConfigFormato(e) {
+            if (e && e.target !== document.getElementById('modal-config-formato') && e.target.className !== 'modal-close') return;
+            document.getElementById('modal-config-formato').classList.remove('activo');
+        }
+
+        async function guardarCambiosConfig() {
+            const id = document.getElementById('config-id-formato').value;
+            const payload = {
+                nombre: document.getElementById('config-nombre').value.trim(),
+                modulo: document.getElementById('config-modulo').value,
+                descripcion: document.getElementById('config-descripcion').value.trim(),
+                activo: document.getElementById('config-activo').checked
+            };
+
+            if (!payload.nombre) return alert('El nombre es obligatorio');
+
+            try {
+                const url = id ? `/bienestar/api/formatos/${id}` : '/bienestar/api/formatos/nuevo';
+                const metodo = id ? 'PATCH' : 'POST';
+
+                const r = await fetch(url, {
+                    method: metodo,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const d = await r.json();
+                
+                if (d.exito) {
+                    cerrarModalConfigFormato();
+                    cargarAdminFormatos();
+                    // También recargamos los formatos del panel principal por si cambiaron nombres
+                    cargarFormatos();
+                } else {
+                    alert(d.mensaje || 'Error al guardar');
+                }
+            } catch(e) {
+                alert('Error de conexión');
+            }
+        }
+
+        async function eliminarAdminFormato(id, nombre) {
+            if (!confirm(`¿Estás seguro de eliminar el formato "${nombre}"? Esta acción borrará el registro y el archivo Word del servidor permanentemente.`)) return;
+            
+            try {
+                const r = await fetch(`/bienestar/api/formatos/${id}`, { method: 'DELETE' });
+                const d = await r.json();
+                if (d.exito) {
+                    cargarAdminFormatos();
+                    cargarFormatos();
+                } else {
+                    alert(d.mensaje || 'Error al eliminar');
+                }
+            } catch(e) {
+                alert('Error de conexión');
+            }
+        }
+
     </script>
 </body>
 </html>

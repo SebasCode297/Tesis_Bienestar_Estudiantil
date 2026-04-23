@@ -108,15 +108,69 @@ const verDocumento = async (req, res) => {
 
 const crearFormato = async (req, res) => {
     try {
-        const { nombre, modulo } = req.body;
+        const { nombre, modulo, descripcion } = req.body;
         if (!nombre || !modulo) {
-            return res.status(400).json({ exito: false, mensaje: 'Faltan datos' });
+            return res.status(400).json({ exito: false, mensaje: 'Faltan datos obligatorios (nombre y módulo)' });
         }
-        const nuevo = await formatoModelo.crear(nombre, modulo);
-        res.status(201).json({ exito: true, datos: nuevo });
+        // El nuevo modelo ya soporta descripción
+        const nuevo = await formatoModelo.crear(nombre, modulo, descripcion || '');
+        res.status(201).json({ exito: true, datos: nuevo, mensaje: 'Formato creado con éxito' });
     } catch (error) {
         console.error('Error al crear formato:', error);
-        res.status(500).json({ exito: false, mensaje: 'Error al registrar' });
+        res.status(500).json({ exito: false, mensaje: 'Error al registrar el formato' });
+    }
+};
+
+const actualizarFormato = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nombre, modulo, descripcion, activo } = req.body;
+        
+        if (!nombre || !modulo) {
+            return res.status(400).json({ exito: false, mensaje: 'Nombre y módulo son requeridos' });
+        }
+
+        const actualizado = await formatoModelo.actualizar(id, { 
+            nombre, 
+            modulo, 
+            descripcion: descripcion || '', 
+            activo: activo !== undefined ? activo : true 
+        });
+        
+        if (!actualizado) {
+            return res.status(404).json({ exito: false, mensaje: 'Formato no encontrado' });
+        }
+
+        res.json({ exito: true, datos: actualizado, mensaje: 'Formato actualizado correctamente' });
+    } catch (error) {
+        console.error('Error al actualizar formato:', error);
+        res.status(500).json({ exito: false, mensaje: 'Error al actualizar' });
+    }
+};
+
+const eliminarFormato = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Primero obtenemos datos para borrar el archivo físico si existe
+        const formato = await formatoModelo.obtenerPorId(id);
+        if (formato && formato.archivo_ruta) {
+            const rutaAbsoluta = path.join(__dirname, '..', 'almacenamiento', formato.archivo_ruta);
+            if (fs.existsSync(rutaAbsoluta)) {
+                fs.unlinkSync(rutaAbsoluta);
+            }
+        }
+
+        const eliminado = await formatoModelo.eliminar(id);
+        
+        if (!eliminado) {
+            return res.status(404).json({ exito: false, mensaje: 'Formato no encontrado' });
+        }
+
+        res.json({ exito: true, mensaje: 'Formato eliminado permanentemente del sistema' });
+    } catch (error) {
+        console.error('Error al eliminar formato:', error);
+        res.status(500).json({ exito: false, mensaje: 'Error al eliminar el formato' });
     }
 };
 
@@ -234,6 +288,8 @@ module.exports = {
     descargarDocumento,
     verDocumento,
     crearFormato,
+    actualizarFormato,
+    eliminarFormato,
     obtenerCampos,
     guardarWizard,
     generarDocumento

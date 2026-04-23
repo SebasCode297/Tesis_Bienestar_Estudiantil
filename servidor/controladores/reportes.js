@@ -15,6 +15,7 @@ const resumenFormatos = async (req, res) => {
                 COUNT(archivo_ruta) AS cargados,
                 COUNT(*) - COUNT(archivo_ruta) AS pendientes
             FROM formatos
+            WHERE activo = true
         `);
         res.json({ exito: true, datos: resultado.rows[0] });
     } catch (error) {
@@ -23,7 +24,7 @@ const resumenFormatos = async (req, res) => {
     }
 };
 
-// Estadísticas generales del sistema
+// Estadísticas generales del sistema (Reforzado para Tesis)
 const estadisticasGenerales = async (req, res) => {
     try {
         // Total de estudiantes registrados
@@ -34,7 +35,7 @@ const estadisticasGenerales = async (req, res) => {
             SELECT COUNT(DISTINCT ef.estudiante_id) 
             FROM estudiante_formatos ef
             JOIN formatos f ON ef.formato_id = f.id
-            WHERE f.modulo = 'beca'
+            WHERE f.modulo = 'beca' AND f.activo = true
         `);
 
         // Estudiantes con al menos un formato de seguimiento vinculado
@@ -42,11 +43,26 @@ const estadisticasGenerales = async (req, res) => {
             SELECT COUNT(DISTINCT ef.estudiante_id)
             FROM estudiante_formatos ef
             JOIN formatos f ON ef.formato_id = f.id
-            WHERE f.modulo = 'seguimiento'
+            WHERE f.modulo = 'seguimiento' AND f.activo = true
         `);
 
-        // Total de asignaciones de formatos
-        const totalAsignaciones = await pool.query('SELECT COUNT(*) FROM estudiante_formatos');
+        // Eficacia de Alertas (Control de Gestión)
+        const alertasStats = await pool.query(`
+            SELECT 
+                COUNT(*) as total,
+                COUNT(*) FILTER (WHERE estado = 'Pendiente') as pendientes,
+                COUNT(*) FILTER (WHERE estado = 'En Proceso') as en_proceso,
+                COUNT(*) FILTER (WHERE estado = 'Resuelto') as resueltas
+            FROM alertas_tempranas
+        `);
+
+        // Distribución por Carrera (Para gráficos)
+        const porCarrera = await pool.query(`
+            SELECT carrera, COUNT(*) as cantidad 
+            FROM estudiantes 
+            GROUP BY carrera 
+            ORDER BY cantidad DESC
+        `);
 
         res.json({
             exito: true,
@@ -54,7 +70,8 @@ const estadisticasGenerales = async (req, res) => {
                 totalEstudiantes:   parseInt(totalEstudiantes.rows[0].count),
                 enBeca:             parseInt(enBeca.rows[0].count),
                 enSeguimiento:      parseInt(enSeguimiento.rows[0].count),
-                totalAsignaciones:  parseInt(totalAsignaciones.rows[0].count)
+                alertas:            alertasStats.rows[0],
+                porCarrera:         porCarrera.rows[0] ? porCarrera.rows : []
             }
         });
     } catch (error) {
