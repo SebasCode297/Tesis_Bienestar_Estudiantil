@@ -2,11 +2,11 @@
   "name": "bienestar-estudiantil",
   "version": "1.0.0",
   "description": "Sistema web para el Departamento de Bienestar Estudiantil",
-  "main": "servidor/app.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node servidor/app.js",
-    "inicio": "node servidor/app.js",
-    "desarrollo": "nodemon servidor/app.js"
+    "start": "node index.js",
+    "inicio": "node index.js",
+    "desarrollo": "nodemon index.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

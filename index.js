@@ -14,7 +14,7 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path    = require('path');
-const pool    = require('./config/baseDatos');
+const pool    = require('./servidor/config/baseDatos');
 
 // Crea la instancia de la aplicación Express
 const app   = express();
@@ -29,10 +29,10 @@ app.set('trust proxy', 1);
 // =============================================
 
 // Sirve los archivos estáticos de la capa de presentación
-app.use(express.static(path.join(__dirname, '..', 'cliente')));
+app.use(express.static(path.join(__dirname, 'cliente')));
 
 // Sirve los archivos subidos (informes, plantillas)
-app.use('/almacenamiento', express.static(path.join(__dirname, '..', 'almacenamiento')));
+app.use('/almacenamiento', express.static(path.join(__dirname, 'almacenamiento')));
 
 // Permite que Express entienda JSON en el cuerpo de las solicitudes
 app.use(express.json());
@@ -63,10 +63,10 @@ app.use(session({
 // =============================================
 
 // Importa las rutas de cada módulo para separar la lógica por responsabilidades
-const rutasBienestar   = require('./rutas/autenticacion'); // Importa rutas de login y sesión
-const rutasEstudiantes = require('./rutas/estudiantes'); // Importa rutas para gestión de datos de alumnos
-const rutasReportes    = require('./rutas/reportes'); // Importa rutas para generación de estadísticas
-const rutasAlertas     = require('./rutas/alertas'); // Importa rutas para el sistema de alertas tempranas
+const rutasBienestar   = require('./servidor/rutas/autenticacion'); // Importa rutas de login y sesión
+const rutasEstudiantes = require('./servidor/rutas/estudiantes'); // Importa rutas para gestión de datos de alumnos
+const rutasReportes    = require('./servidor/rutas/reportes'); // Importa rutas para generación de estadísticas
+const rutasAlertas     = require('./servidor/rutas/alertas'); // Importa rutas para el sistema de alertas tempranas
 
 // Registra las rutas de autenticación bajo el prefijo '/bienestar' para acceso público
 app.use('/bienestar', rutasBienestar); // Middleware que monta las rutas de autenticación
@@ -86,7 +86,7 @@ app.get('/test', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'cliente', 'inicio', 'index.html'));
+    res.sendFile(path.join(__dirname, 'cliente', 'inicio', 'index.html'));
 });
 
 // =============================================
