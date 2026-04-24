@@ -81,6 +81,10 @@ app.use('/bienestar/api/alertas', rutasAlertas); // Punto final para la gestión
 // RUTA PRINCIPAL — página de inicio
 // Sirve el index.html de la carpeta inicio/
 // =============================================
+app.get('/test', (req, res) => {
+    res.send('<h1>🚀 EL SERVIDOR ESTÁ VIVO Y ACTUALIZADO 🚀</h1><p>Fecha: ' + new Date().toLocaleString() + '</p>');
+});
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'cliente', 'inicio', 'index.html'));
 });
