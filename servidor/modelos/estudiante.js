@@ -84,42 +84,6 @@ const obtenerPorId = async (id) => { // Define función de búsqueda individual
     return resultado.rows[0]; // Retorna el primer y único registro encontrado
 }; // Cierre de la función obtenerPorId
 
-// Función para asignar un formato de documento a un estudiante
-const vincularFormato = async (estudianteId, formatoId, observacion) => { // Define función de vinculación
-    const resultado = await pool.query( // Ejecuta la inserción en la tabla relacional
-        `INSERT INTO estudiante_formatos (estudiante_id, formato_id, observacion)
-         VALUES ($1, $2, $3)
-         RETURNING *`, // Inserta y retorna el registro de la asignación
-        [estudianteId, formatoId, observacion || ''] // Pasa IDs y comentario opcional
-    ); // Fin de la ejecución
-    return resultado.rows[0]; // Retorna el objeto de la asignación creada
-}; // Cierre de la función vincularFormato
-
-// Función para listar todos los formatos que tiene asignados un estudiante
-const obtenerFormatos = async (estudianteId) => { // Define función de listado de formatos
-    const resultado = await pool.query( // Ejecuta consulta con JOIN para traer nombres de formatos
-        `SELECT ef.id AS asignacion_id, ef.observacion, ef.asignado_en,
-                ef.finalizado_en,
-                (CASE WHEN ef.respuestas_json IS NULL THEN FALSE ELSE TRUE END) AS documento_generado,
-                f.id AS formato_id, f.nombre, f.modulo, f.archivo_ruta
-         FROM estudiante_formatos ef
-         JOIN formatos f ON ef.formato_id = f.id
-         WHERE ef.estudiante_id = $1
-         ORDER BY ef.asignado_en DESC`, // SQL que une tablas y ordena por fecha de asignación
-        [estudianteId] // Filtra por el ID del estudiante
-    ); // Fin de la ejecución
-    return resultado.rows; // Retorna la lista de formatos vinculados
-}; // Cierre de la función obtenerFormatos
-
-// Función para eliminar la relación entre un estudiante y un formato
-const desvincularFormato = async (asignacionId) => { // Define función para borrar asignación
-    const resultado = await pool.query( // Ejecuta el borrado por ID de asignación
-        'DELETE FROM estudiante_formatos WHERE id = $1 RETURNING *', // Borra y devuelve el registro borrado
-        [asignacionId] // Pasa el ID de la tabla relacional
-    ); // Fin de la ejecución
-    return resultado.rows[0]; // Retorna el registro que fue eliminado
-}; // Cierre de la función desvincularFormato
-
 // Función para contar la cantidad total de estudiantes en el sistema
 const contar = async () => { // Define función de conteo estadístico
     const resultado = await pool.query('SELECT COUNT(*) FROM estudiantes'); // Ejecuta cuenta en la tabla estudiantes
@@ -130,8 +94,5 @@ module.exports = { // Exporta el objeto con todas las funciones del modelo
     upsertMasivo, // Exporta carga masiva
     obtenerTodos, // Exporta listado filtrado
     obtenerPorId, // Exporta búsqueda individual
-    vincularFormato, // Exporta asignación de formato
-    obtenerFormatos, // Exporta consulta de asignaciones
-    desvincularFormato, // Exporta eliminación de asignación
     contar // Exporta conteo total
 }; // Fin del módulo de exportación de estudiantes

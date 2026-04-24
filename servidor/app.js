@@ -8,12 +8,12 @@
 
 // Carga las variables de entorno desde el archivo .env
 require('dotenv').config();
+// CACHE_BUSTER_V2: Forzando reconstrucción total en Vercel
 
 // Importa los módulos principales
 const express = require('express');
 const session = require('express-session');
 const path    = require('path');
-const PgSession = require('connect-pg-simple')(session);
 const pool    = require('./config/baseDatos');
 
 // Crea la instancia de la aplicación Express
@@ -45,18 +45,15 @@ app.use(express.urlencoded({ extended: true }));
 // Se usa connect-pg-simple para que las sesiones
 // persistan en la base de datos (necesario en Vercel)
 // =============================================
+// Configuración de sesiones en memoria RAM (temporalmente para evitar errores de tabla de BD)
 app.use(session({
-    store: new PgSession({
-        pool: pool,                // Conexión a la base de datos
-        tableName: 'session'      // Nombre de la tabla (el script semilla la puede crear)
-    }),
     secret:            process.env.SESION_SECRETO || 'bienestar_istpet_secreto_2026',
     resave:            false,
     saveUninitialized: false,
     cookie: {
         maxAge:   3600000,
         httpOnly: true,
-        secure:   process.env.NODE_ENV === 'production' // true en producción
+        secure:   process.env.NODE_ENV === 'production'
     }
 }));
 
@@ -67,7 +64,6 @@ app.use(session({
 
 // Importa las rutas de cada módulo para separar la lógica por responsabilidades
 const rutasBienestar   = require('./rutas/autenticacion'); // Importa rutas de login y sesión
-const rutasFormatos    = require('./rutas/formatos'); // Importa rutas para gestión de documentos Word
 const rutasEstudiantes = require('./rutas/estudiantes'); // Importa rutas para gestión de datos de alumnos
 const rutasReportes    = require('./rutas/reportes'); // Importa rutas para generación de estadísticas
 const rutasAlertas     = require('./rutas/alertas'); // Importa rutas para el sistema de alertas tempranas
@@ -76,7 +72,6 @@ const rutasAlertas     = require('./rutas/alertas'); // Importa rutas para el si
 app.use('/bienestar', rutasBienestar); // Middleware que monta las rutas de autenticación
 
 // Registra las APIs protegidas de cada módulo funcional del sistema
-app.use('/bienestar/api/formatos', rutasFormatos); // Punto final para operaciones con plantillas
 app.use('/bienestar/api/estudiantes', rutasEstudiantes); // Punto final para CRUD de estudiantes
 app.use('/bienestar/api/reportes', rutasReportes); // Punto final para obtener datos de reportes
 app.use('/bienestar/api/alertas', rutasAlertas); // Punto final para la gestión de alertas

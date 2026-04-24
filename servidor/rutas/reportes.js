@@ -11,9 +11,6 @@ const { verificarSesion } = require('../middlewares/verificarSesion');
 // Endpoints API — Todos protegidos con verificarSesion
 // =============================================
 
-// GET /bienestar/api/reportes/resumen — Formatos cargados vs pendientes
-router.get('/resumen', verificarSesion, reportesControlador.resumenFormatos);
-
 // GET /bienestar/api/reportes/estadisticas — Totales generales
 router.get('/estadisticas', verificarSesion, reportesControlador.estadisticasGenerales);
 

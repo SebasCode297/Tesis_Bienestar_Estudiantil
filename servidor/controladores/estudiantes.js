@@ -156,47 +156,9 @@ const obtenerDetalle = async (req, res) => {
             return res.status(404).json({ exito: false, mensaje: 'Estudiante no encontrado' });
         }
 
-        // También traemos sus formatos vinculados
-        const formatos = await estudianteModelo.obtenerFormatos(id);
-
-        res.json({ exito: true, datos: { ...estudiante, formatos } });
+        res.json({ exito: true, datos: estudiante });
     } catch (error) {
         console.error('Error al obtener detalle:', error);
-        res.status(500).json({ exito: false, mensaje: 'Error interno del servidor' });
-    }
-};
-
-// Vincula un formato a un estudiante
-const vincularFormato = async (req, res) => {
-    try {
-        const { id } = req.params; // ID del estudiante
-        const { formatoId, observacion } = req.body;
-
-        if (!formatoId) {
-            return res.status(400).json({ exito: false, mensaje: 'Debe seleccionar un formato' });
-        }
-
-        const asignacion = await estudianteModelo.vincularFormato(id, formatoId, observacion);
-        res.json({ exito: true, datos: asignacion, mensaje: 'Formato vinculado correctamente' });
-    } catch (error) {
-        console.error('Error al vincular formato:', error);
-        res.status(500).json({ exito: false, mensaje: 'Error al vincular formato' });
-    }
-};
-
-// Desvincula un formato de un estudiante
-const desvincularFormato = async (req, res) => {
-    try {
-        const { asignacionId } = req.params;
-        const eliminado = await estudianteModelo.desvincularFormato(asignacionId);
-
-        if (!eliminado) {
-            return res.status(404).json({ exito: false, mensaje: 'Asignación no encontrada' });
-        }
-
-        res.json({ exito: true, mensaje: 'Formato desvinculado' });
-    } catch (error) {
-        console.error('Error al desvincular formato:', error);
         res.status(500).json({ exito: false, mensaje: 'Error interno del servidor' });
     }
 };
@@ -205,7 +167,5 @@ module.exports = {
     cargarMasiva,
     descargarPlantilla,
     listar,
-    obtenerDetalle,
-    vincularFormato,
-    desvincularFormato
+    obtenerDetalle
 };
