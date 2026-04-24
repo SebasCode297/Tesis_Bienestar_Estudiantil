@@ -3,14 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel — Bienestar Estudiantil</title>
-    <link rel="stylesheet" href="estilos/panel.css">
+    <title>Panel de Bienestar | ISTPET</title>
+    
+    <!-- Fuentes y Iconos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Estilos Personalizados -->
+    <link rel="stylesheet" href="./estilos/panel.css">
 </head>
 <body>
-    <div style="display:flex; justify-content:center; align-items:center; height:100vh; flex-direction:column; font-family:sans-serif; color:#1e2b6e;">
-        <h1>Panel de Bienestar Estudiantil</h1>
-        <p>Este panel ha sido reseteado. Estamos listos para empezar a construir de nuevo.</p>
-        <a href="/bienestar/cerrar-sesion" style="margin-top:20px; color:#c0392b; text-decoration:none; font-weight:bold;">Cerrar Sesión</a>
-    </div>
+
+    <!-- =============================================
+         MENÚ LATERAL (SIDEBAR)
+    ============================================== -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>ISTPET</h2>
+            <small>Bienestar Estudiantil</small>
+        </div>
+        
+        <nav class="menu-links">
+            <a href="#" class="menu-item active">
+                <i class="fa-solid fa-house"></i>
+                <span>Inicio / Dashboard</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Gestión Estudiantil</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Alertas Tempranas</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Reportes Institucionales</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fa-solid fa-gears"></i>
+                <span>Configuración</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <a href="/logout" class="menu-item" style="color: #f87171;">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- =============================================
+         CONTENIDO PRINCIPAL
+    ============================================== -->
+    <main class="main-content">
+        
+        <!-- Cabecera de bienvenida -->
+        <header class="header-top">
+            <div class="welcome-text">
+                <h1>Panel de Gestión y Control</h1>
+                <p>Bienvenido, Administrador de Bienestar Estudiantil</p>
+            </div>
+            <div class="user-profile" style="display: flex; align-items: center; gap: 15px;">
+                <div class="date-now" id="current-date" style="font-weight: 600; color: #64748b;"></div>
+                <div class="avatar" style="width: 45px; height: 45px; border-radius: 50%; background: #ddd; border: 2px solid var(--accent-color);"></div>
+            </div>
+        </header>
+
+        <!-- Sección de Estadísticas en vivo -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #3b82f6; background: #eff6ff;">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="stat-value" id="stat-total-alumnos">0</div>
+                <div class="stat-label">Alumnos Monitoreados</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #ef4444; background: #fef2f2;">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+                <div class="stat-value" id="stat-alertas-criticas">0</div>
+                <div class="stat-label">Alertas Críticas</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #10b981; background: #ecfdf5;">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="stat-value" id="stat-casos-resueltos">0</div>
+                <div class="stat-label">Casos Resueltos</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon" style="color: #f59e0b; background: #fffbeb;">
+                    <i class="fa-solid fa-spinner"></i>
+                </div>
+                <div class="stat-value" id="stat-en-proceso">0</div>
+                <div class="stat-label">En Intervención</div>
+            </div>
+        </section>
+
+        <!-- Cuadros de información detallada -->
+        <div class="content-grid">
+            <div class="panel-box">
+                <div class="panel-title">
+                    <span>Alertas Recientes</span>
+                    <button style="border: none; background: none; color: var(--accent-color); cursor: pointer; font-weight: 600;">Ver todo</button>
+                </div>
+                <div id="lista-alertas-recientes">
+                    <p style="color: #94a3b8; text-align: center; padding: 20px;">Cargando datos del servidor...</p>
+                </div>
+            </div>
+
+            <div class="panel-box">
+                <div class="panel-title">Distribución por Carrera</div>
+                <div id="chart-carreras" style="height: 200px; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                    (Gráfico Estadístico)
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Script de Lógica -->
+    <script src="./js/panel.js"></script>
 </body>
 </html>

@@ -86,7 +86,7 @@ app.get('/test', (req, res) => {
 });
 
 app.get('/bienestar/panel', (req, res) => {
-    res.sendFile(path.join(__dirname, 'cliente', 'panel', 'index.html'));
+    res.sendFile(path.join(__dirname, 'cliente', 'bienestar', 'panel', 'index.html'));
 });
 
 app.get('/', (req, res) => {
