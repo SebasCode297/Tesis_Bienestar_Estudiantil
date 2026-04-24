@@ -28,10 +28,6 @@ router.post('/cargar-masiva', verificarSesion, cargador.single('archivo_datos'),
 // GET /bienestar/api/estudiantes/:id — Detalle de 1 estudiante + formatos subidos y vinculados actualmente
 router.get('/:id', verificarSesion, estudiantesControlador.obtenerDetalle);
 
-// POST /bienestar/api/estudiantes/:id/formatos — Vincula un formato oficial a un estudiante para que él lo vea
-router.post('/:id/formatos', verificarSesion, estudiantesControlador.vincularFormato);
-
-// DELETE /bienestar/api/estudiantes/:estudianteId/formatos/:asignacionId — Retira o revoca la vinculación
-router.delete('/:estudianteId/formatos/:asignacionId', verificarSesion, estudiantesControlador.desvincularFormato);
+// Las rutas de formatos han sido eliminadas para simplificar el sistema según el plan de tesis.
 
 module.exports = router;
