@@ -85,6 +85,10 @@ app.get('/test', (req, res) => {
     res.send('<h1>🚀 EL SERVIDOR ESTÁ VIVO Y ACTUALIZADO 🚀</h1><p>Fecha: ' + new Date().toLocaleString() + '</p>');
 });
 
+app.get('/bienestar/panel', (req, res) => {
+    res.sendFile(path.join(__dirname, 'cliente', 'panel', 'index.html'));
+});
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'cliente', 'inicio', 'index.html'));
 });
