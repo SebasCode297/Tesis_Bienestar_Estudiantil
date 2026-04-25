@@ -22,16 +22,16 @@ const upsertMasivo = async (estudiantes) => {
             );
             const yaExistia = comprobacion.rows.length > 0;
 
-            // Inserta o actualiza — solo los 5 campos requeridos, sin bcrypt
+            // Inserta o actualiza — incluye contrasena por defecto para cumplir restricción NOT NULL
             await cliente.query(`
-                INSERT INTO estudiantes (cedula, nombres, apellidos, correo_institucional, telefono)
-                VALUES ($1, $2, $3, $4, $5)
+                INSERT INTO estudiantes (cedula, nombres, apellidos, correo_institucional, telefono, contrasena)
+                VALUES ($1, $2, $3, $4, $5, $6)
                 ON CONFLICT (cedula) DO UPDATE SET 
                   nombres = EXCLUDED.nombres,
                   apellidos = EXCLUDED.apellidos,
                   correo_institucional = EXCLUDED.correo_institucional,
                   telefono = EXCLUDED.telefono
-            `, [e.cedula, e.nombres, e.apellidos, e.correo || '', e.telefono || '']);
+            `, [e.cedula, e.nombres, e.apellidos, e.correo || '', e.telefono || '', e.cedula]);
 
             if (yaExistia) actualizados++;
             else insertados++;
