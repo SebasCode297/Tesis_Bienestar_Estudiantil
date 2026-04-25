@@ -68,18 +68,17 @@ app.use(session({
 // =============================================
 
 // Importa las rutas de cada módulo para separar la lógica por responsabilidades
-const rutasBienestar   = require('./servidor/rutas/autenticacion'); // Importa rutas de login y sesión
-const rutasEstudiantes = require('./servidor/rutas/estudiantes'); // Importa rutas para gestión de datos de alumnos
-const rutasReportes    = require('./servidor/rutas/reportes'); // Importa rutas para generación de estadísticas
-const rutasAlertas     = require('./servidor/rutas/alertas'); // Importa rutas para el sistema de alertas tempranas
+const rutasBienestar   = require('./servidor/rutas/autenticacion');
+const rutasEstudiantes = require('./servidor/rutas/estudiantes');
+const rutasReportes    = require('./servidor/rutas/reportes');
+const rutasAlertas     = require('./servidor/rutas/alertas');
+const rutasFormatos    = require('./servidor/rutas/formatos');
 
-// Registra las rutas de autenticación bajo el prefijo '/bienestar' para acceso público
-app.use('/bienestar', rutasBienestar); // Middleware que monta las rutas de autenticación
-
-// Registra las APIs protegidas de cada módulo funcional del sistema
-app.use('/bienestar/api/estudiantes', rutasEstudiantes); // Punto final para CRUD de estudiantes
-app.use('/bienestar/api/reportes', rutasReportes); // Punto final para obtener datos de reportes
-app.use('/bienestar/api/alertas', rutasAlertas); // Punto final para la gestión de alertas
+app.use('/bienestar', rutasBienestar);
+app.use('/bienestar/api/estudiantes', rutasEstudiantes);
+app.use('/bienestar/api/reportes', rutasReportes);
+app.use('/bienestar/api/alertas', rutasAlertas);
+app.use('/bienestar/api/formatos', rutasFormatos);
 
 
 // =============================================
@@ -96,6 +95,10 @@ app.get('/bienestar/panel', (req, res) => {
 
 app.get('/bienestar/estudiantes', (req, res) => {
     res.sendFile(path.join(__dirname, 'cliente', 'bienestar', 'panel', 'estudiantes.html'));
+});
+
+app.get('/bienestar/configuracion', (req, res) => {
+    res.sendFile(path.join(__dirname, 'cliente', 'bienestar', 'panel', 'configuracion.html'));
 });
 
 app.get('/', (req, res) => {
