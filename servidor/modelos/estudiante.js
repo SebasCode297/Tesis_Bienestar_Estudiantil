@@ -22,15 +22,14 @@ const upsertMasivo = async (estudiantes) => { // Define función asíncrona de c
             const contrasenaHash = await bcrypt.hash(e.cedula, 8); // Genera un hash de la cédula como contraseña inicial
 
             await cliente.query(`
-                INSERT INTO estudiantes (cedula, nombres, apellidos, correo, carrera, semestre, contrasena)
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
+                INSERT INTO estudiantes (cedula, nombres, apellidos, correo_institucional, telefono, contrasena)
+                VALUES ($1, $2, $3, $4, $5, $6)
                 ON CONFLICT (cedula) DO UPDATE SET 
                   nombres = EXCLUDED.nombres,
                   apellidos = EXCLUDED.apellidos,
-                  correo = EXCLUDED.correo,
-                  carrera = EXCLUDED.carrera,
-                  semestre = EXCLUDED.semestre
-            `, [e.cedula, e.nombres, e.apellidos, e.correo, e.carrera, e.semestre, contrasenaHash]); // Inserta o actualiza datos si hay conflicto de cédula
+                  correo_institucional = EXCLUDED.correo_institucional,
+                  telefono = EXCLUDED.telefono
+            `, [e.cedula, e.nombres, e.apellidos, e.correo, e.telefono, contrasenaHash]); // Inserta o actualiza datos si hay conflicto de cédula
 
             if (yaExistia) actualizados++; // Incrementa contador de actualizaciones si ya existía
             else insertados++; // Incrementa contador de nuevos si no existía
@@ -47,32 +46,19 @@ const upsertMasivo = async (estudiantes) => { // Define función asíncrona de c
 }; // Cierre de la función upsertMasivo
 
 // Función para obtener la lista de estudiantes con filtros opcionales
-const obtenerTodos = async (busqueda = '', carrera = '', semestre = '') => { // Define función con parámetros de filtro
-    let consulta = 'SELECT * FROM estudiantes WHERE 1=1'; // Inicia la cadena de consulta SQL base
-    let parametros = []; // Array para almacenar los valores de los parámetros
-    let contador = 1; // Contador para los marcadores de posición ($1, $2, ...)
+const obtenerTodos = async (busqueda = '') => {
+    let consulta = 'SELECT * FROM estudiantes WHERE 1=1';
+    let parametros = [];
 
-    if (carrera && carrera !== '') { // Verifica si se proporcionó filtro de carrera
-        consulta += ` AND carrera = $${contador}`; // Añade condición de carrera a la consulta
-        parametros.push(carrera); // Guarda el valor de la carrera en los parámetros
-        contador++; // Aumenta el contador para el siguiente parámetro
-    } // Fin del filtro carrera
+    if (busqueda.trim()) {
+        consulta += ` AND (nombres ILIKE $1 OR apellidos ILIKE $1 OR cedula ILIKE $1)`;
+        parametros.push(`%${busqueda}%`);
+    }
 
-    if (semestre && semestre !== '') { // Verifica si se proporcionó filtro de semestre
-        consulta += ` AND semestre = $${contador}`; // Añade condición de semestre a la consulta
-        parametros.push(semestre); // Guarda el valor del semestre en los parámetros
-        contador++; // Aumenta el contador
-    } // Fin del filtro semestre
-
-    if (busqueda.trim()) { // Verifica si hay texto en la búsqueda de nombre o cédula
-        consulta += ` AND (nombres ILIKE $${contador} OR apellidos ILIKE $${contador})`; // Añade búsqueda por coincidencia parcial
-        parametros.push(`%${busqueda}%`); // Guarda el patrón de búsqueda con comodines
-        contador++; // Aumenta el contador
-    } // Fin de búsqueda por texto
-
-    consulta += ' ORDER BY apellidos ASC, nombres ASC'; // Ordena alfabéticamente por apellidos y nombres
-    const resultado = await pool.query(consulta, parametros); // Ejecuta la consulta SQL parametrizada
-    return resultado.rows; // Retorna todas las filas obtenidas
+    consulta += ' ORDER BY apellidos ASC, nombres ASC';
+    const resultado = await pool.query(consulta, parametros);
+    return resultado.rows;
+};
 }; // Cierre de la función obtenerTodos
 
 // Función para obtener los detalles de un solo estudiante por su ID único

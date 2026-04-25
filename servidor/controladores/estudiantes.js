@@ -6,36 +6,26 @@
 const estudianteModelo = require('../modelos/estudiante');
 const xlsx = require('xlsx');
 
-// Descarga un Excel de ejemplo con las columnas obligatorias
+// Descarga un Excel de ejemplo con las columnas obligatorias solicitadas
 const descargarPlantilla = (req, res) => {
     try {
         const infoEjemplo = [
             {
-                Nombres: 'Carlos Sebastian',
-                Apellidos: 'Pilamunga Quiroga',
-                Cédula: '1700000000',
-                Carrera: 'Desarrollo de Software',
-                Semestres: '3ro',
-                'Correo Institucional': 'carlos.pilamunga@istpet.edu.ec'
-            },
-            {
-                Nombres: 'María Fernanda',
-                Apellidos: 'López Ruiz',
-                Cédula: '1700000001',
-                Carrera: 'Contabilidad',
-                Semestres: '1ro',
-                'Correo Institucional': 'maria.lopez@istpet.edu.ec'
+                'Cédula': '1700000000',
+                'Nombres': 'Juan Pérez',
+                'Apellidos': 'García López',
+                'Teléfono': '0987654321',
+                'Correo Institucional': 'juan.perez@istpet.edu.ec'
             }
         ];
 
         const hoja = xlsx.utils.json_to_sheet(infoEjemplo);
         const libro = xlsx.utils.book_new();
-        xlsx.utils.book_append_sheet(libro, hoja, 'Plantilla');
+        xlsx.utils.book_append_sheet(libro, hoja, 'Plantilla_Estudiantes');
 
-        // Convierte el libro a un buffer en memoria
         const buffer = xlsx.write(libro, { type: 'buffer', bookType: 'xlsx' });
 
-        res.setHeader('Content-Disposition', 'attachment; filename="Plantilla_Estudiantes.xlsx"');
+        res.setHeader('Content-Disposition', 'attachment; filename="Plantilla_ISTPET.xlsx"');
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         res.send(buffer);
     } catch (error) {
@@ -44,127 +34,83 @@ const descargarPlantilla = (req, res) => {
     }
 };
 
-// Carga masiva de estudiantes leyendo un archivo Excel o CSV desde la RAM
-const cargarMasiva = async (req, res) => {
+// Carga desde Excel procesando solo los 5 campos requeridos
+const cargarDesdeExcel = async (req, res) => {
     try {
-        // req.file lo inyecta multer y está en la RAM (buffer)
         if (!req.file) {
-            return res.status(400).json({ exito: false, mensaje: 'Debe subir un documento válido' });
+            return res.status(400).json({ exito: false, mensaje: 'Debe subir un documento válido (.xlsx)' });
         }
 
-        // 1. Lee el archivo y accede a la 1ra hoja
         const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
-        const nombrePrimeraHoja = workbook.SheetNames[0];
-        const hojaSeleccionada = workbook.Sheets[nombrePrimeraHoja];
-
-        // 2. Convierte todo lo que encuentre en filas JSON usando la línea 1 como cabeceras / llaves
-        const filas = xlsx.utils.sheet_to_json(hojaSeleccionada);
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const filas = xlsx.utils.sheet_to_json(sheet);
 
         if (!filas || filas.length === 0) {
-            return res.status(400).json({ exito: false, mensaje: 'El archivo subido está vacío o sin datos' });
+            return res.status(400).json({ exito: false, mensaje: 'El archivo está vacío' });
         }
 
         const estudiantesValidos = [];
-        let filasErroneasAIgnorar = 0;
 
-        // 3. Limpiar y mapear datos tolerando ligeras variaciones en los títulos que la gente acostumbra a inventar
         for (const fila of filas) {
-            const nombres = fila['Nombres'] || fila['nombres'] || fila['NOMBRES'] || fila['Nombre'];
-            const apellidos = fila['Apellidos'] || fila['apellidos'] || fila['APELLIDOS'] || fila['Apellido'];
-            const cedula = fila['Cédula'] || fila['Cedula'] || fila['cedula'] || fila['CEDULA'];
-            const correo = fila['Correo Institucional'] || fila['Correo'] || fila['correo'] || fila['CORREO'];
-            const carrera = fila['Carrera'] || fila['carrera'] || fila['CARRERA'];
-            const semestre = fila['Semestres'] || fila['Semestre'] || fila['semestre'] || fila['SEMESTRE'];
+            // Mapeo flexible de nombres de columnas
+            const cedula = fila['Cédula'] || fila['Cedula'] || fila['ID'];
+            const nombres = fila['Nombres'] || fila['Nombre'];
+            const apellidos = fila['Apellidos'] || fila['Apellido'];
+            const telefono = fila['Teléfono'] || fila['Telefono'] || fila['Celular'];
+            const correo = fila['Correo Institucional'] || fila['Correo'];
 
-            // Regla de negocio: Obligatorios Nombres, Apellidos, Cédula y Carrera
-            if (cedula && nombres && apellidos && carrera) {
-                const nombresTrim = String(nombres).trim();
-                const apellidosTrim = String(apellidos).trim();
-
-                let correoFinal = correo ? String(correo).trim().toLowerCase() : '';
-
-                // Autogenerar correo si está en blanco
-                if (!correoFinal) {
-                    // Remover acentos y tomar primer nombre y apellido
-                    const pNombre = nombresTrim.split(' ')[0].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                    const pApellido = apellidosTrim.split(' ')[0].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-                    correoFinal = `${pNombre}.${pApellido}@istpet.edu.ec`;
-                }
-
-                // Normalizar semestre (extraer solo el número central: "3ro", "3ero" -> "3")
-                let semestreLimpio = '1';
-                if (semestre) {
-                    const match = String(semestre).match(/\d+/);
-                    semestreLimpio = match ? match[0] : '1';
-                }
-
+            if (cedula && nombres && apellidos) {
                 estudiantesValidos.push({
                     cedula: String(cedula).trim(),
-                    nombres: nombresTrim,
-                    apellidos: apellidosTrim,
-                    correo: correoFinal,
-                    carrera: String(carrera).trim(),
-                    semestre: semestreLimpio
+                    nombres: String(nombres).trim(),
+                    apellidos: String(apellidos).trim(),
+                    telefono: telefono ? String(telefono).trim() : '',
+                    correo: correo ? String(correo).trim().toLowerCase() : ''
                 });
-            } else {
-                filasErroneasAIgnorar++;
             }
         }
 
         if (estudiantesValidos.length === 0) {
-            return res.status(400).json({ 
-                exito: false, 
-                mensaje: 'No se identificó a ningún estudiante válido. Valida que los títulos de tus columnas coincidan con la plantilla.' 
-            });
+            return res.status(400).json({ exito: false, mensaje: 'No se encontraron datos válidos en el archivo' });
         }
 
-        // 4. Inserción segura con Postgres y devolvemos qué pasó
         const resultados = await estudianteModelo.upsertMasivo(estudiantesValidos);
 
         res.json({
             exito: true,
-            mensaje: `Se detectaron ${estudiantesValidos.length} filas válidas. \nNuevos registrados: ${resultados.insertados} \nEstudiantes actualizados: ${resultados.actualizados}`,
-            datos: resultados,
-            ignorados: filasErroneasAIgnorar
+            contador: estudiantesValidos.length,
+            mensaje: `Procesados: ${estudiantesValidos.length}. Nuevos: ${resultados.insertados}, Actualizados: ${resultados.actualizados}`
         });
 
     } catch (error) {
-        console.error('Error al procesar el Excel:', error);
-        res.status(500).json({ exito: false, mensaje: 'Hubo un error al interpretar el formato de los datos' });
+        console.error('Error Excel:', error);
+        res.status(500).json({ exito: false, mensaje: 'Error al procesar el archivo Excel' });
     }
 };
 
-// Lista todos los estudiantes (con búsqueda opcional via query ?buscar=)
 const listar = async (req, res) => {
     try {
         const busqueda = req.query.buscar || '';
         const estudiantes = await estudianteModelo.obtenerTodos(busqueda);
         res.json({ exito: true, datos: estudiantes });
     } catch (error) {
-        console.error('Error al listar estudiantes:', error);
-        res.status(500).json({ exito: false, mensaje: 'Error al obtener estudiantes' });
+        res.status(500).json({ exito: false, mensaje: 'Error al obtener lista' });
     }
 };
 
-// Obtiene el detalle de un estudiante + sus formatos vinculados
 const obtenerDetalle = async (req, res) => {
     try {
         const { id } = req.params;
         const estudiante = await estudianteModelo.obtenerPorId(id);
-
-        if (!estudiante) {
-            return res.status(404).json({ exito: false, mensaje: 'Estudiante no encontrado' });
-        }
-
+        if (!estudiante) return res.status(404).json({ exito: false, mensaje: 'No encontrado' });
         res.json({ exito: true, datos: estudiante });
     } catch (error) {
-        console.error('Error al obtener detalle:', error);
-        res.status(500).json({ exito: false, mensaje: 'Error interno del servidor' });
+        res.status(500).json({ exito: false, mensaje: 'Error de servidor' });
     }
 };
 
 module.exports = {
-    cargarMasiva,
+    cargarDesdeExcel,
     descargarPlantilla,
     listar,
     obtenerDetalle

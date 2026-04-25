@@ -22,8 +22,8 @@ router.get('/', verificarSesion, estudiantesControlador.listar);
 // GET /bienestar/api/estudiantes/descargar-plantilla — Entrega el archivo Excel vacío con las cabeceras
 router.get('/descargar-plantilla', verificarSesion, estudiantesControlador.descargarPlantilla);
 
-// POST /bienestar/api/estudiantes/cargar-masiva — Recibe y parsea el archivo Excel
-router.post('/cargar-masiva', verificarSesion, cargador.single('archivo_datos'), estudiantesControlador.cargarMasiva);
+// POST /bienestar/api/estudiantes/cargar-excel — Recibe y parsea el archivo Excel
+router.post('/cargar-excel', verificarSesion, cargador.single('excel'), estudiantesControlador.cargarDesdeExcel);
 
 // GET /bienestar/api/estudiantes/:id — Detalle de 1 estudiante + formatos subidos y vinculados actualmente
 router.get('/:id', verificarSesion, estudiantesControlador.obtenerDetalle);
