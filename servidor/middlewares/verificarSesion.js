@@ -9,15 +9,18 @@
 // Verifica que exista req.session.usuario con rol 'bienestar'
 // =============================================
 const verificarSesion = (req, res, next) => {
-    // Verifica si existe la sesión y si el usuario tiene rol de bienestar
     if (req.session && req.session.usuario && req.session.usuario.rol === 'bienestar') {
-        // Sesión válida: permite continuar al controlador o ruta siguiente
         return next();
     }
-
-    // Sin sesión válida: redirige al login
     return res.redirect('/bienestar/login');
 };
 
-// Exporta el middleware para usarlo en las rutas
-module.exports = { verificarSesion };
+// Middleware para rutas API: devuelve JSON 401 en vez de redirigir
+const verificarSesionAPI = (req, res, next) => {
+    if (req.session && req.session.usuario && req.session.usuario.rol === 'bienestar') {
+        return next();
+    }
+    return res.status(401).json({ exito: false, mensaje: 'Sesión no válida. Vuelve a iniciar sesión.' });
+};
+
+module.exports = { verificarSesion, verificarSesionAPI };
