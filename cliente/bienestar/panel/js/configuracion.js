@@ -63,8 +63,10 @@ async function confirmarSubida() {
         return;
     }
 
+    // Guardar referencia ANTES de cerrar el modal (cerrarModal pone archivoWordPendiente en null)
+    const archivoParaSubir = archivoWordPendiente;
     cerrarModal();
-    await subirWord(archivoWordPendiente, nombre, tipo);
+    await subirWord(archivoParaSubir, nombre, tipo);
 }
 
 // =============================================
