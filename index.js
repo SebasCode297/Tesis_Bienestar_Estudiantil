@@ -42,16 +42,21 @@ app.use(express.urlencoded({ extended: true }));
 
 // =============================================
 // CONFIGURACIÓN DE SESIONES
-// Se usa connect-pg-simple para que las sesiones
-// persistan en la base de datos (necesario en Vercel)
+// connect-pg-simple guarda las sesiones en Neon (PostgreSQL)
+// Necesario para que funcionen en Vercel (serverless)
 // =============================================
-// Configuración de sesiones en memoria RAM (temporalmente para evitar errores de tabla de BD)
+const pgSession = require('connect-pg-simple')(session);
+
 app.use(session({
+    store: new pgSession({
+        pool:      pool,         // Reutiliza la conexión ya configurada con Neon
+        tableName: 'session'     // Tabla creada manualmente en Neon
+    }),
     secret:            process.env.SESION_SECRETO || 'bienestar_istpet_secreto_2026',
     resave:            false,
     saveUninitialized: false,
     cookie: {
-        maxAge:   3600000,
+        maxAge:   3600000,   // 1 hora de duración
         httpOnly: true,
         secure:   process.env.NODE_ENV === 'production'
     }
