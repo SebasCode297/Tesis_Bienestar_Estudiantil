@@ -58,7 +58,6 @@ const obtenerTodos = async (busqueda = '') => {
     consulta += ' ORDER BY apellidos ASC, nombres ASC';
     const resultado = await pool.query(consulta, parametros);
     return resultado.rows;
-};
 }; // Cierre de la función obtenerTodos
 
 // Función para obtener los detalles de un solo estudiante por su ID único
