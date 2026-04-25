@@ -90,13 +90,12 @@ const iniciarSesion = async (req, res) => {
 // y redirige al login
 // =============================================
 const cerrarSesion = (req, res) => {
-    // Destruye la sesión en el servidor
     req.session.destroy((error) => {
         if (error) {
             console.error('❌ Error al cerrar sesión:', error.message);
         }
-        // Redirige al inicio (Landing Page)
-        res.redirect('/');
+        // Siempre redirige al login, sin importar si hubo error
+        res.redirect('/bienestar/login');
     });
 };
 
