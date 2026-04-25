@@ -61,22 +61,36 @@
 <body>
 
     <aside class="sidebar">
-        <div class="sidebar-brand">
-            <div class="brand-icon"><i class="fa-solid fa-graduation-cap"></i></div>
-            <div class="brand-text">
-                <span class="brand-name">ISTPET</span>
-                <span class="brand-sub">Bienestar Estudiantil</span>
-            </div>
+        <div class="sidebar-header">
+            <h2>ISTPET</h2>
+            <small>Bienestar Estudiantil</small>
         </div>
-        <nav class="sidebar-nav">
-            <a href="/bienestar/panel" class="nav-item"><i class="fa-solid fa-house"></i><span>Inicio / Dashboard</span></a>
-            <a href="/bienestar/estudiantes" class="nav-item active"><i class="fa-solid fa-users"></i><span>Gestión Estudiantil</span></a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-triangle-exclamation"></i><span>Alertas Tempranas</span></a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-chart-bar"></i><span>Reportes Institucionales</span></a>
-            <a href="/bienestar/configuracion" class="nav-item"><i class="fa-solid fa-gear"></i><span>Configuración</span></a>
+        <nav class="menu-links">
+            <a href="/bienestar/panel" class="menu-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Inicio / Dashboard</span>
+            </a>
+            <a href="/bienestar/estudiantes" class="menu-item active">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Gestión Estudiantil</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Alertas Tempranas</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Reportes Institucionales</span>
+            </a>
+            <a href="/bienestar/configuracion" class="menu-item">
+                <i class="fa-solid fa-gears"></i>
+                <span>Configuración</span>
+            </a>
         </nav>
-        <div class="sidebar-footer">
-            <a href="/bienestar/cerrar-sesion" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a>
+        <div style="padding: 20px; margin-top: auto;">
+            <a href="/bienestar/cerrar-sesion" style="display:flex; align-items:center; gap:10px; color:#ef4444; text-decoration:none; font-weight:600; font-size:0.85rem;">
+                <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+            </a>
         </div>
     </aside>
 
