@@ -3,49 +3,51 @@
 // Consultas SQL para la gestión de estudiantes
 // =============================================
 
-const pool = require('../config/baseDatos'); // Importación de la conexión a la base de datos PostgreSQL
-const bcrypt = require('bcryptjs'); // Importación de la librería para encriptar contraseñas
+const pool = require('../config/baseDatos'); // Conexión a la base de datos PostgreSQL
 
-// Función para insertar o actualizar múltiples estudiantes (Carga Masiva)
-const upsertMasivo = async (estudiantes) => { // Define función asíncrona de carga masiva
-    const cliente = await pool.connect(); // Obtiene un cliente dedicado de la piscina de conexiones
-    let insertados = 0; // Contador para rastrear registros nuevos insertados
-    let actualizados = 0; // Contador para rastrear registros existentes actualizados
+// Función para insertar o actualizar múltiples estudiantes (Carga Masiva desde Excel)
+const upsertMasivo = async (estudiantes) => {
+    const cliente = await pool.connect(); // Cliente dedicado para la transacción
+    let insertados = 0;
+    let actualizados = 0;
 
-    try { // Bloque try para manejar errores durante la transacción
-        await cliente.query('BEGIN'); // Inicia el bloque de transacción SQL
+    try {
+        await cliente.query('BEGIN'); // Inicia la transacción
 
-        for (const e of estudiantes) { // Itera sobre cada objeto estudiante recibido del Excel
-            const comprobacion = await cliente.query('SELECT id FROM estudiantes WHERE cedula = $1', [e.cedula]); // Busca si la cédula ya existe
-            const yaExistia = comprobacion.rows.length > 0; // Determina si el registro es una actualización
+        for (const e of estudiantes) {
+            // Verifica si el estudiante ya existe por su cédula
+            const comprobacion = await cliente.query(
+                'SELECT id FROM estudiantes WHERE cedula = $1',
+                [e.cedula]
+            );
+            const yaExistia = comprobacion.rows.length > 0;
 
-            const contrasenaHash = await bcrypt.hash(e.cedula, 8); // Genera un hash de la cédula como contraseña inicial
-
+            // Inserta o actualiza — solo los 5 campos requeridos, sin bcrypt
             await cliente.query(`
-                INSERT INTO estudiantes (cedula, nombres, apellidos, correo_institucional, telefono, contrasena)
-                VALUES ($1, $2, $3, $4, $5, $6)
+                INSERT INTO estudiantes (cedula, nombres, apellidos, correo_institucional, telefono)
+                VALUES ($1, $2, $3, $4, $5)
                 ON CONFLICT (cedula) DO UPDATE SET 
                   nombres = EXCLUDED.nombres,
                   apellidos = EXCLUDED.apellidos,
                   correo_institucional = EXCLUDED.correo_institucional,
                   telefono = EXCLUDED.telefono
-            `, [e.cedula, e.nombres, e.apellidos, e.correo, e.telefono, contrasenaHash]); // Inserta o actualiza datos si hay conflicto de cédula
+            `, [e.cedula, e.nombres, e.apellidos, e.correo || '', e.telefono || '']);
 
-            if (yaExistia) actualizados++; // Incrementa contador de actualizaciones si ya existía
-            else insertados++; // Incrementa contador de nuevos si no existía
-        } // Fin del bucle for
-        
-        await cliente.query('COMMIT'); // Confirma y guarda todos los cambios en la base de datos
-        return { insertados, actualizados }; // Retorna los resultados del proceso
-    } catch (error) { // Captura errores durante el proceso
-        await cliente.query('ROLLBACK'); // Deshace todos los cambios si hubo algún error
-        throw error; // Lanza el error para que sea manejado por el controlador
-    } finally { // Bloque que se ejecuta siempre al final
-        cliente.release(); // Libera el cliente de vuelta a la piscina de conexiones
-    } // Fin del bloque finally
-}; // Cierre de la función upsertMasivo
+            if (yaExistia) actualizados++;
+            else insertados++;
+        }
 
-// Función para obtener la lista de estudiantes con filtros opcionales
+        await cliente.query('COMMIT'); // Guarda todos los cambios
+        return { insertados, actualizados };
+    } catch (error) {
+        await cliente.query('ROLLBACK'); // Deshace si algo falla
+        throw error;
+    } finally {
+        cliente.release(); // Libera el cliente de vuelta al pool
+    }
+};
+
+// Función para obtener la lista de estudiantes con búsqueda opcional
 const obtenerTodos = async (busqueda = '') => {
     let consulta = 'SELECT * FROM estudiantes WHERE 1=1';
     let parametros = [];
@@ -58,26 +60,26 @@ const obtenerTodos = async (busqueda = '') => {
     consulta += ' ORDER BY apellidos ASC, nombres ASC';
     const resultado = await pool.query(consulta, parametros);
     return resultado.rows;
-}; // Cierre de la función obtenerTodos
+};
 
-// Función para obtener los detalles de un solo estudiante por su ID único
-const obtenerPorId = async (id) => { // Define función de búsqueda individual
-    const resultado = await pool.query( // Ejecuta la consulta directa por ID
-        'SELECT * FROM estudiantes WHERE id = $1', // SQL simple para filtrar por id
-        [id] // Pasa el ID como parámetro seguro
-    ); // Fin de la ejecución
-    return resultado.rows[0]; // Retorna el primer y único registro encontrado
-}; // Cierre de la función obtenerPorId
+// Función para obtener un solo estudiante por ID
+const obtenerPorId = async (id) => {
+    const resultado = await pool.query(
+        'SELECT * FROM estudiantes WHERE id = $1',
+        [id]
+    );
+    return resultado.rows[0];
+};
 
-// Función para contar la cantidad total de estudiantes en el sistema
-const contar = async () => { // Define función de conteo estadístico
-    const resultado = await pool.query('SELECT COUNT(*) FROM estudiantes'); // Ejecuta cuenta en la tabla estudiantes
-    return parseInt(resultado.rows[0].count); // Retorna el número entero obtenido
-}; // Cierre de la función contar
+// Función para contar el total de estudiantes
+const contar = async () => {
+    const resultado = await pool.query('SELECT COUNT(*) FROM estudiantes');
+    return parseInt(resultado.rows[0].count);
+};
 
-module.exports = { // Exporta el objeto con todas las funciones del modelo
-    upsertMasivo, // Exporta carga masiva
-    obtenerTodos, // Exporta listado filtrado
-    obtenerPorId, // Exporta búsqueda individual
-    contar // Exporta conteo total
-}; // Fin del módulo de exportación de estudiantes
+module.exports = {
+    upsertMasivo,
+    obtenerTodos,
+    obtenerPorId,
+    contar
+};
