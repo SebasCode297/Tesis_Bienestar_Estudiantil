@@ -123,7 +123,6 @@ function renderizarLista(formatos) {
     if (formatos.length === 0) {
         contenedor.innerHTML = `
             <div class="formatos-vacio">
-                <i class="fa-solid fa-file-circle-plus"></i>
                 Sube tu primer formato Word para empezar
             </div>`;
         return;
@@ -132,15 +131,12 @@ function renderizarLista(formatos) {
     contenedor.innerHTML = formatos.map(f => `
         <div class="formato-item ${f.id === formatoActualId ? 'activo' : ''}" 
              onclick="seleccionarFormato(${f.id})" data-id="${f.id}">
-            <div class="formato-item-icono ${f.tipo === 'beca' ? 'tipo-beca' : 'tipo-apoyo'}">
-                <i class="fa-solid fa-file-lines"></i>
-            </div>
             <div class="formato-item-info">
                 <div class="formato-item-nombre">${f.nombre}</div>
                 <div class="formato-item-tipo">${f.tipo === 'beca' ? 'Becas' : 'Apoyo Estudiantil'}</div>
             </div>
             <button class="formato-item-del" onclick="eliminarFormato(event, ${f.id}, '${f.nombre}')" title="Eliminar">
-                <i class="fa-solid fa-trash"></i>
+                Eliminar
             </button>
         </div>
     `).join('');
