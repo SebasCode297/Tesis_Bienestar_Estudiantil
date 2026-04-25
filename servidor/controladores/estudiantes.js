@@ -52,12 +52,17 @@ const cargarDesdeExcel = async (req, res) => {
         const estudiantesValidos = [];
 
         for (const fila of filas) {
-            // Mapeo flexible de nombres de columnas
-            const cedula = fila['Cédula'] || fila['Cedula'] || fila['ID'];
-            const nombres = fila['Nombres'] || fila['Nombre'];
-            const apellidos = fila['Apellidos'] || fila['Apellido'];
-            const telefono = fila['Teléfono'] || fila['Telefono'] || fila['Celular'];
-            const correo = fila['Correo Institucional'] || fila['Correo'];
+            // Normalizar claves a minúsculas para lectura flexible (sin importar si el Excel usa mayúsculas o minúsculas)
+            const filaLower = {};
+            for (const key of Object.keys(fila)) {
+                filaLower[key.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '')] = fila[key];
+            }
+
+            const cedula    = filaLower['cedula'] || filaLower['id'];
+            const nombres   = filaLower['nombres'] || filaLower['nombre'];
+            const apellidos = filaLower['apellidos'] || filaLower['apellido'];
+            const telefono  = filaLower['telefono'] || filaLower['celular'] || filaLower['phone'];
+            const correo    = filaLower['correo institucional'] || filaLower['correo'] || filaLower['email'];
 
             if (cedula && nombres && apellidos) {
                 estudiantesValidos.push({
