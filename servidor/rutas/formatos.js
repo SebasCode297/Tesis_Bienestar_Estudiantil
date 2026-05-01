@@ -15,6 +15,7 @@ const cargador = multer({ storage: multer.memoryStorage() });
 router.get('/', verificarSesionAPI, formatosControlador.listar);
 router.get('/:id', verificarSesionAPI, formatosControlador.obtenerDetalle);
 router.post('/subir', verificarSesionAPI, cargador.single('word'), formatosControlador.subirDesdeWord);
+router.post('/subir-vacio', verificarSesionAPI, formatosControlador.crearVacio);
 router.put('/:id', verificarSesionAPI, formatosControlador.guardarEdicion);
 router.delete('/:id', verificarSesionAPI, formatosControlador.eliminar);
 

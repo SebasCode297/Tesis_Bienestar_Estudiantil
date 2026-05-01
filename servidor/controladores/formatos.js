@@ -17,6 +17,21 @@ const listar = async (req, res) => {
     }
 };
 
+// Crea un formato nuevo directamente desde el editor (sin archivo Word)
+const crearVacio = async (req, res) => {
+    try {
+        const { nombre, tipo, contenido_html } = req.body;
+        if (!nombre || !nombre.trim()) {
+            return res.status(400).json({ exito: false, mensaje: 'El nombre es obligatorio' });
+        }
+        const formato = await formatoModelo.crear(nombre.trim(), tipo || 'apoyo', contenido_html || '');
+        res.json({ exito: true, mensaje: `Formato "${formato.nombre}" creado correctamente`, datos: formato });
+    } catch (error) {
+        console.error('Error al crear formato vacío:', error);
+        res.status(500).json({ exito: false, mensaje: 'Error al crear formato' });
+    }
+};
+
 // Obtiene el contenido completo de un formato para editarlo
 const obtenerDetalle = async (req, res) => {
     try {
@@ -100,4 +115,4 @@ const eliminar = async (req, res) => {
     }
 };
 
-module.exports = { listar, obtenerDetalle, subirDesdeWord, guardarEdicion, eliminar };
+module.exports = { listar, crearVacio, obtenerDetalle, subirDesdeWord, guardarEdicion, eliminar };

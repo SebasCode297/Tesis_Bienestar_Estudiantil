@@ -1,14 +1,18 @@
 /**
  * =============================================
- * LÓGICA DE CONFIGURACIÓN DE FORMATOS
+ * CONFIGURACIÓN DE FORMATOS — LÓGICA
+ * Dos módulos: Seguimiento Estudiantil (apoyo) y Becas (beca)
  * =============================================
  */
 
 let quill = null;
-let formatoActualId = null;
+let moduloActual = null;       // 'apoyo' | 'beca'
+let formatoEditandoId = null;  // ID del formato en edición (null = nuevo)
 let archivoWordPendiente = null;
 
-// Inicializa el editor y carga los formatos al cargar la página
+// =============================================
+// INICIO
+// =============================================
 document.addEventListener('DOMContentLoaded', () => {
     // Inicializar editor Quill
     quill = new Quill('#editor-quill', {
@@ -19,11 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 ['bold', 'italic', 'underline'],
                 [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                 [{ 'align': [] }],
-                ['link', 'image'],
+                ['link'],
                 ['clean']
             ]
         },
-        placeholder: 'El contenido del formato aparecerá aquí...'
+        placeholder: 'Escribe o edita el contenido del formato aquí...'
     });
 
     // Escuchar selección de archivo Word
@@ -31,24 +35,88 @@ document.addEventListener('DOMContentLoaded', () => {
         const archivo = e.target.files[0];
         if (archivo) {
             archivoWordPendiente = archivo;
-            abrirModal();
+            abrirModalNombre();
         }
     });
-
-    // Cargar formatos existentes
-    cargarFormatos();
 });
 
 // =============================================
-// MODAL — Pedir nombre antes de subir
+// NAVEGACIÓN ENTRE VISTAS
 // =============================================
-function abrirModal() {
-    document.getElementById('modal-nombre').style.display = 'flex';
+function abrirModulo(tipo) {
+    moduloActual = tipo;
+    const nombre = tipo === 'beca' ? 'Becas' : 'Seguimiento Estudiantil';
+
+    document.getElementById('titulo-pagina').textContent = nombre;
+    document.getElementById('subtitulo-pagina').textContent =
+        tipo === 'beca' ? 'Formatos del módulo de Becas.' : 'Formatos del módulo de Seguimiento Estudiantil.';
+    document.getElementById('modulo-titulo-lista').textContent = nombre;
+
+    document.getElementById('vista-modulos').style.display = 'none';
+    document.getElementById('vista-formatos').classList.add('visible');
+
+    cargarFormatos(tipo);
+}
+
+function volverModulos() {
+    moduloActual = null;
+    document.getElementById('titulo-pagina').textContent = 'Configuración de Formatos';
+    document.getElementById('subtitulo-pagina').textContent = 'Selecciona un módulo para gestionar sus formatos.';
+    document.getElementById('vista-modulos').style.display = '';
+    document.getElementById('vista-formatos').classList.remove('visible');
+    document.getElementById('input-word').value = '';
+}
+
+// =============================================
+// CARGAR FORMATOS DEL MÓDULO
+// =============================================
+async function cargarFormatos(tipo) {
+    const tbody = document.getElementById('tabla-formatos-body');
+    tbody.innerHTML = '<tr><td colspan="3" class="tabla-vacia">Cargando...</td></tr>';
+
+    try {
+        const respuesta = await fetch('/bienestar/api/formatos');
+        const data = await respuesta.json();
+
+        if (!data.exito) throw new Error(data.mensaje);
+
+        // Filtrar por tipo del módulo actual
+        const formatos = data.datos.filter(f => f.tipo === tipo);
+
+        if (formatos.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3" class="tabla-vacia">No hay formatos aún. Sube uno desde Word o crea uno nuevo.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = formatos.map(f => {
+            const fecha = new Date(f.creado_en).toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' });
+            return `
+            <tr>
+                <td><strong>${f.nombre}</strong></td>
+                <td>${fecha}</td>
+                <td style="text-align:right;">
+                    <button class="btn-editar" onclick="editarFormato(${f.id})">Editar</button>
+                    <button class="btn-eliminar" onclick="eliminarFormato(${f.id}, '${f.nombre}')">Eliminar</button>
+                </td>
+            </tr>`;
+        }).join('');
+
+    } catch (error) {
+        console.error('Error al cargar formatos:', error);
+        tbody.innerHTML = `<tr><td colspan="3" class="tabla-vacia">Error al cargar los formatos.</td></tr>`;
+    }
+}
+
+// =============================================
+// MODAL NOMBRE (para subir Word)
+// =============================================
+function abrirModalNombre() {
+    document.getElementById('modal-nombre').classList.add('visible');
     document.getElementById('modal-nombre-input').focus();
 }
 
-function cerrarModal() {
-    document.getElementById('modal-nombre').style.display = 'none';
+function cerrarModalNombre() {
+    document.getElementById('modal-nombre').classList.remove('visible');
     document.getElementById('modal-nombre-input').value = '';
     archivoWordPendiente = null;
     document.getElementById('input-word').value = '';
@@ -56,40 +124,29 @@ function cerrarModal() {
 
 async function confirmarSubida() {
     const nombre = document.getElementById('modal-nombre-input').value.trim();
-    const tipo   = document.getElementById('modal-tipo-select').value;
+    if (!nombre) { alert('Por favor escribe el nombre del formato.'); return; }
 
-    if (!nombre) {
-        alert('Por favor escribe el nombre del formato.');
-        return;
-    }
-
-    // Guardar referencia ANTES de cerrar el modal (cerrarModal pone archivoWordPendiente en null)
     const archivoParaSubir = archivoWordPendiente;
-    cerrarModal();
-    await subirWord(archivoParaSubir, nombre, tipo);
+    cerrarModalNombre();
+    await subirWord(archivoParaSubir, nombre);
 }
 
 // =============================================
-// SUBIDA DE WORD
+// SUBIR WORD
 // =============================================
-async function subirWord(archivo, nombre, tipo) {
+async function subirWord(archivo, nombre) {
     const formData = new FormData();
     formData.append('word', archivo);
     formData.append('nombre', nombre);
-    formData.append('tipo', tipo);
+    formData.append('tipo', moduloActual);
 
     try {
-        const respuesta = await fetch('/bienestar/api/formatos/subir', {
-            method: 'POST',
-            body: formData
-        });
+        const respuesta = await fetch('/bienestar/api/formatos/subir', { method: 'POST', body: formData });
         const resultado = await respuesta.json();
 
         if (resultado.exito) {
-            alert(`✅ ${resultado.mensaje}`);
-            await cargarFormatos();
-            // Abrir el formato recién subido en el editor
-            abrirEnEditor(resultado.datos);
+            alert(`✅ "${nombre}" cargado correctamente.`);
+            cargarFormatos(moduloActual);
         } else {
             alert(`❌ Error: ${resultado.mensaje}`);
         }
@@ -100,139 +157,98 @@ async function subirWord(archivo, nombre, tipo) {
 }
 
 // =============================================
-// CARGAR LISTA DE FORMATOS
+// CREAR FORMATO VACÍO (sin Word)
 // =============================================
-async function cargarFormatos() {
-    try {
-        const respuesta = await fetch('/bienestar/api/formatos');
-        const data = await respuesta.json();
-
-        if (data.exito) {
-            renderizarLista(data.datos);
-        }
-    } catch (error) {
-        console.error('Error al cargar formatos:', error);
-    }
-}
-
-function renderizarLista(formatos) {
-    const contenedor = document.getElementById('lista-formatos');
-    const contador   = document.getElementById('contador-formatos');
-    contador.textContent = `${formatos.length} formato${formatos.length !== 1 ? 's' : ''}`;
-
-    if (formatos.length === 0) {
-        contenedor.innerHTML = `
-            <div class="formatos-vacio">
-                Sube tu primer formato Word para empezar
-            </div>`;
-        return;
-    }
-
-    contenedor.innerHTML = formatos.map(f => `
-        <div class="formato-item ${f.id === formatoActualId ? 'activo' : ''}" 
-             onclick="seleccionarFormato(${f.id})" data-id="${f.id}">
-            <div class="formato-item-info">
-                <div class="formato-item-nombre">${f.nombre}</div>
-                <div class="formato-item-tipo">${f.tipo === 'beca' ? 'Becas' : 'Apoyo Estudiantil'}</div>
-            </div>
-            <button class="formato-item-del" onclick="eliminarFormato(event, ${f.id}, '${f.nombre}')" title="Eliminar">
-                Eliminar
-            </button>
-        </div>
-    `).join('');
+function crearFormatoVacio() {
+    formatoEditandoId = null;
+    document.getElementById('editor-nombre').value = '';
+    quill.root.innerHTML = '';
+    document.getElementById('editor-overlay').classList.add('visible');
+    document.getElementById('editor-nombre').focus();
 }
 
 // =============================================
-// SELECCIONAR FORMATO — carga en editor
+// EDITAR FORMATO EXISTENTE
 // =============================================
-async function seleccionarFormato(id) {
+async function editarFormato(id) {
     try {
         const respuesta = await fetch(`/bienestar/api/formatos/${id}`);
         const data = await respuesta.json();
+        if (!data.exito) throw new Error(data.mensaje);
 
-        if (data.exito) {
-            abrirEnEditor(data.datos);
-        }
+        formatoEditandoId = id;
+        document.getElementById('editor-nombre').value = data.datos.nombre;
+        quill.root.innerHTML = data.datos.contenido_html || '';
+        document.getElementById('editor-overlay').classList.add('visible');
     } catch (error) {
-        console.error('Error al obtener formato:', error);
+        console.error('Error al cargar formato:', error);
+        alert('Error al cargar el formato.');
     }
 }
 
-function abrirEnEditor(formato) {
-    formatoActualId = formato.id;
-
-    // Actualizar lista visual (marcar como activo)
-    document.querySelectorAll('.formato-item').forEach(el => {
-        el.classList.toggle('activo', parseInt(el.dataset.id) === formato.id);
-    });
-
-    // Mostrar panel editor
-    document.getElementById('editor-empty').style.display = 'none';
-    const editorContenido = document.getElementById('editor-contenido');
-    editorContenido.style.display = 'flex';
-
-    // Llenar datos
-    document.getElementById('editor-nombre').value = formato.nombre;
-    document.getElementById('editor-tipo').value   = formato.tipo;
-
-    // Cargar HTML en Quill
-    quill.root.innerHTML = formato.contenido_html || '';
-}
-
 // =============================================
-// GUARDAR EDICIÓN
+// GUARDAR FORMATO (crear o editar)
 // =============================================
 async function guardarFormato() {
-    if (!formatoActualId) return;
-
     const nombre = document.getElementById('editor-nombre').value.trim();
-    const tipo   = document.getElementById('editor-tipo').value;
     const html   = quill.root.innerHTML;
 
     if (!nombre) { alert('El nombre no puede estar vacío.'); return; }
 
     try {
-        const respuesta = await fetch(`/bienestar/api/formatos/${formatoActualId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, tipo, contenido_html: html })
-        });
-        const resultado = await respuesta.json();
+        let respuesta;
+        if (formatoEditandoId) {
+            // Actualizar existente
+            respuesta = await fetch(`/bienestar/api/formatos/${formatoEditandoId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, tipo: moduloActual, contenido_html: html })
+            });
+        } else {
+            // Crear nuevo vacío
+            respuesta = await fetch('/bienestar/api/formatos/subir-vacio', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, tipo: moduloActual, contenido_html: html })
+            });
+        }
 
+        const resultado = await respuesta.json();
         if (resultado.exito) {
-            alert('✅ Formato guardado correctamente.');
-            cargarFormatos();
+            cerrarEditor();
+            cargarFormatos(moduloActual);
         } else {
             alert(`❌ Error: ${resultado.mensaje}`);
         }
     } catch (error) {
         console.error('Error al guardar:', error);
-        alert('❌ Error al guardar. Intenta de nuevo.');
+        alert('Error al guardar el formato.');
     }
 }
 
 // =============================================
 // ELIMINAR FORMATO
 // =============================================
-async function eliminarFormato(event, id, nombre) {
-    event.stopPropagation();
-    if (!confirm(`¿Seguro que quieres eliminar "${nombre}"? Esta acción no se puede deshacer.`)) return;
+async function eliminarFormato(id, nombre) {
+    if (!confirm(`¿Eliminar "${nombre}"? Esta acción no se puede deshacer.`)) return;
 
     try {
         const respuesta = await fetch(`/bienestar/api/formatos/${id}`, { method: 'DELETE' });
         const resultado = await respuesta.json();
-
         if (resultado.exito) {
-            if (formatoActualId === id) {
-                formatoActualId = null;
-                document.getElementById('editor-empty').style.display = 'flex';
-                document.getElementById('editor-contenido').style.display = 'none';
-            }
-            cargarFormatos();
+            cargarFormatos(moduloActual);
         } else {
             alert(`❌ Error: ${resultado.mensaje}`);
         }
     } catch (error) {
         console.error('Error al eliminar:', error);
     }
+}
+
+// =============================================
+// CERRAR EDITOR
+// =============================================
+function cerrarEditor() {
+    document.getElementById('editor-overlay').classList.remove('visible');
+    formatoEditandoId = null;
 }
