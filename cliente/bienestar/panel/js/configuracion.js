@@ -1,33 +1,38 @@
 /**
  * =============================================
  * CONFIGURACIÓN DE FORMATOS — LÓGICA
- * Dos módulos: Seguimiento Estudiantil (apoyo) y Becas (beca)
+ * Editor: CKEditor 5 (tablas + imágenes)
  * =============================================
  */
 
-let quill = null;
-let moduloActual = null;       // 'apoyo' | 'beca'
-let formatoEditandoId = null;  // ID del formato en edición (null = nuevo)
+let editorCK = null;
+let moduloActual = null;
+let formatoEditandoId = null;
 let archivoWordPendiente = null;
 
 // =============================================
 // INICIO
 // =============================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar editor Quill
-    quill = new Quill('#editor-quill', {
-        theme: 'snow',
-        modules: {
-            toolbar: [
-                [{ 'header': [1, 2, 3, false] }],
-                ['bold', 'italic', 'underline'],
-                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                [{ 'align': [] }],
-                ['link'],
-                ['clean']
-            ]
+    // Inicializar CKEditor 5
+    ClassicEditor.create(document.getElementById('editor-ckeditor'), {
+        toolbar: [
+            'heading', '|',
+            'bold', 'italic', 'underline', '|',
+            'bulletedList', 'numberedList', '|',
+            'alignment', '|',
+            'insertTable', '|',
+            'imageUpload', 'link', '|',
+            'undo', 'redo'
+        ],
+        table: {
+            contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells']
         },
-        placeholder: 'Escribe o edita el contenido del formato aquí...'
+        placeholder: 'El contenido del formato aparecerá aquí...'
+    }).then(editor => {
+        editorCK = editor;
+    }).catch(error => {
+        console.error('Error al iniciar CKEditor:', error);
     });
 
     // Escuchar selección de archivo Word
@@ -80,7 +85,6 @@ async function cargarFormatos(tipo) {
 
         if (!data.exito) throw new Error(data.mensaje);
 
-        // Filtrar por tipo del módulo actual
         const formatos = data.datos.filter(f => f.tipo === tipo);
 
         if (formatos.length === 0) {
@@ -89,7 +93,9 @@ async function cargarFormatos(tipo) {
         }
 
         tbody.innerHTML = formatos.map(f => {
-            const fecha = new Date(f.creado_en).toLocaleDateString('es-EC', { day: '2-digit', month: 'short', year: 'numeric' });
+            const fecha = new Date(f.creado_en).toLocaleDateString('es-EC', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
             return `
             <tr>
                 <td><strong>${f.nombre}</strong></td>
@@ -157,12 +163,12 @@ async function subirWord(archivo, nombre) {
 }
 
 // =============================================
-// CREAR FORMATO VACÍO (sin Word)
+// CREAR FORMATO VACÍO
 // =============================================
 function crearFormatoVacio() {
     formatoEditandoId = null;
     document.getElementById('editor-nombre').value = '';
-    quill.root.innerHTML = '';
+    if (editorCK) editorCK.setData('');
     document.getElementById('editor-overlay').classList.add('visible');
     document.getElementById('editor-nombre').focus();
 }
@@ -178,7 +184,7 @@ async function editarFormato(id) {
 
         formatoEditandoId = id;
         document.getElementById('editor-nombre').value = data.datos.nombre;
-        quill.root.innerHTML = data.datos.contenido_html || '';
+        if (editorCK) editorCK.setData(data.datos.contenido_html || '');
         document.getElementById('editor-overlay').classList.add('visible');
     } catch (error) {
         console.error('Error al cargar formato:', error);
@@ -187,25 +193,23 @@ async function editarFormato(id) {
 }
 
 // =============================================
-// GUARDAR FORMATO (crear o editar)
+// GUARDAR FORMATO
 // =============================================
 async function guardarFormato() {
     const nombre = document.getElementById('editor-nombre').value.trim();
-    const html   = quill.root.innerHTML;
+    const html = editorCK ? editorCK.getData() : '';
 
     if (!nombre) { alert('El nombre no puede estar vacío.'); return; }
 
     try {
         let respuesta;
         if (formatoEditandoId) {
-            // Actualizar existente
             respuesta = await fetch(`/bienestar/api/formatos/${formatoEditandoId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nombre, tipo: moduloActual, contenido_html: html })
             });
         } else {
-            // Crear nuevo vacío
             respuesta = await fetch('/bienestar/api/formatos/subir-vacio', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

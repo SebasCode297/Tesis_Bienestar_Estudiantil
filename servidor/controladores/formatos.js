@@ -57,8 +57,17 @@ const subirDesdeWord = async (req, res) => {
             return res.status(400).json({ exito: false, mensaje: 'El nombre del formato es obligatorio' });
         }
 
-        // Convierte el Word a HTML preservando tablas, texto e imágenes básicas
-        const resultado = await mammoth.convertToHtml({ buffer: req.file.buffer });
+        // Convierte el Word a HTML preservando tablas, texto E IMÁGENES (base64)
+        const resultado = await mammoth.convertToHtml(
+            { buffer: req.file.buffer },
+            {
+                convertImage: mammoth.images.imgElement(function(image) {
+                    return image.read('base64').then(function(datos) {
+                        return { src: 'data:' + image.contentType + ';base64,' + datos };
+                    });
+                })
+            }
+        );
         const htmlConvertido = resultado.value;
 
         if (!htmlConvertido || htmlConvertido.trim() === '') {

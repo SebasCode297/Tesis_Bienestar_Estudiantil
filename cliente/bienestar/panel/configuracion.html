@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/bienestar/panel/estilos/panel.css">
-    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
     <style>
         /* ===== MÓDULOS PRINCIPALES ===== */
         .modulos-grid {
@@ -209,10 +208,10 @@
             cursor: pointer;
             color: #64748b;
         }
-        .editor-modal-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        #editor-quill { flex: 1; }
-        .ql-container { border: none !important; flex: 1; overflow-y: auto; }
-        .ql-toolbar { border: none !important; border-bottom: 1px solid #e2e8f0 !important; }
+        .editor-modal-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+        .editor-modal-body .ck-editor { display: flex; flex-direction: column; flex: 1; height: 100%; }
+        .editor-modal-body .ck-editor__main { flex: 1; overflow-y: auto; }
+        .editor-modal-body .ck-editor__editable { min-height: 400px; height: 100%; }
 
         /* ===== MODAL SUBIR WORD ===== */
         .modal-overlay {
@@ -355,12 +354,12 @@
                 <button class="btn-guardar-editor" onclick="guardarFormato()">Guardar</button>
             </div>
             <div class="editor-modal-body">
-                <div id="editor-quill"></div>
+                <div id="editor-ckeditor"></div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
     <script src="/bienestar/panel/js/configuracion.js"></script>
 </body>
 </html>
