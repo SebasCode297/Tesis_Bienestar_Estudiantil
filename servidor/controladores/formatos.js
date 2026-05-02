@@ -1,10 +1,10 @@
 // =============================================
 // formatos.js — Controlador de la capa de Negocio
-// Usa Google Drive API para conversión Word → HTML de alta fidelidad
+// Usa mammoth para convertir Word → HTML con imágenes base64
 // =============================================
 
 const formatoModelo = require('../modelos/formato');
-const googleDrive = require('../servicios/googleDrive');
+const mammoth = require('mammoth');
 
 // Lista todos los formatos disponibles
 const listar = async (req, res) => {
@@ -45,7 +45,7 @@ const obtenerDetalle = async (req, res) => {
     }
 };
 
-// Sube un Word → Google Drive lo convierte → HTML de alta fidelidad (logo, tablas, imágenes)
+// Sube un Word → mammoth lo convierte a HTML con imágenes base64 (preserva logo en el cuerpo)
 const subirDesdeWord = async (req, res) => {
     try {
         if (!req.file) {
@@ -57,27 +57,30 @@ const subirDesdeWord = async (req, res) => {
             return res.status(400).json({ exito: false, mensaje: 'El nombre del formato es obligatorio' });
         }
 
-        // Google Drive: sube el Word, lo convierte a Google Docs, exporta como HTML
-        const { googleDocId, htmlContent } = await googleDrive.subirWordYConvertir(
-            req.file.buffer,
-            nombre.trim()
+        // Convierte el Word a HTML preservando tablas, texto e imágenes como base64
+        const resultado = await mammoth.convertToHtml(
+            { buffer: req.file.buffer },
+            {
+                convertImage: mammoth.images.imgElement(function(image) {
+                    return image.read('base64').then(function(datos) {
+                        return { src: 'data:' + image.contentType + ';base64,' + datos };
+                    });
+                })
+            }
         );
 
-        if (!htmlContent || htmlContent.trim() === '') {
+        const htmlConvertido = resultado.value;
+
+        if (!htmlConvertido || htmlConvertido.trim() === '') {
             return res.status(400).json({ exito: false, mensaje: 'No se pudo extraer contenido del archivo Word' });
         }
 
-        const formato = await formatoModelo.crear(
-            nombre.trim(),
-            tipo || 'apoyo',
-            htmlContent,
-            googleDocId
-        );
+        const formato = await formatoModelo.crear(nombre.trim(), tipo || 'apoyo', htmlConvertido);
 
         res.json({ exito: true, mensaje: `Formato "${formato.nombre}" cargado correctamente`, datos: formato });
     } catch (error) {
         console.error('Error al subir formato Word:', error);
-        res.status(500).json({ exito: false, mensaje: 'Error al procesar el archivo Word con Google Drive' });
+        res.status(500).json({ exito: false, mensaje: 'Error al procesar el archivo Word' });
     }
 };
 
@@ -101,18 +104,12 @@ const guardarEdicion = async (req, res) => {
     }
 };
 
-// Elimina un formato del sistema (y de Google Drive si aplica)
+// Elimina un formato del sistema
 const eliminar = async (req, res) => {
     try {
         const { id } = req.params;
         const formato = await formatoModelo.eliminar(id);
         if (!formato) return res.status(404).json({ exito: false, mensaje: 'Formato no encontrado' });
-
-        // Si tiene ID en Google Drive, eliminarlo también
-        if (formato.google_doc_id) {
-            await googleDrive.eliminarArchivo(formato.google_doc_id);
-        }
-
         res.json({ exito: true, mensaje: `Formato "${formato.nombre}" eliminado` });
     } catch (error) {
         console.error('Error al eliminar formato:', error);
