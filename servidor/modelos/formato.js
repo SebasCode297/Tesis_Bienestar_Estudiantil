@@ -8,7 +8,7 @@ const pool = require('../config/baseDatos');
 // Obtiene todos los formatos ordenados por tipo y nombre
 const obtenerTodos = async () => {
     const resultado = await pool.query(
-        'SELECT id, nombre, tipo, creado_en, actualizado_en FROM formatos ORDER BY tipo ASC, nombre ASC'
+        'SELECT id, nombre, tipo, google_doc_id, creado_en, actualizado_en FROM formatos ORDER BY tipo ASC, nombre ASC'
     );
     return resultado.rows;
 };
@@ -23,10 +23,10 @@ const obtenerPorId = async (id) => {
 };
 
 // Crea un nuevo formato con su contenido HTML convertido desde Word
-const crear = async (nombre, tipo, contenidoHtml) => {
+const crear = async (nombre, tipo, contenidoHtml, googleDocId = null) => {
     const resultado = await pool.query(
-        'INSERT INTO formatos (nombre, tipo, contenido_html) VALUES ($1, $2, $3) RETURNING *',
-        [nombre, tipo, contenidoHtml]
+        'INSERT INTO formatos (nombre, tipo, contenido_html, google_doc_id) VALUES ($1, $2, $3, $4) RETURNING *',
+        [nombre, tipo, contenidoHtml, googleDocId]
     );
     return resultado.rows[0];
 };

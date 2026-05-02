@@ -1,12 +1,12 @@
 // =============================================
 // formatos.js — Controlador de la capa de Negocio
-// Lógica para subir, convertir, editar y listar formatos
+// Usa Google Drive API para conversión Word → HTML de alta fidelidad
 // =============================================
 
 const formatoModelo = require('../modelos/formato');
-const mammoth = require('mammoth');
+const googleDrive = require('../servicios/googleDrive');
 
-// Lista todos los formatos disponibles (sin el HTML completo para mayor velocidad)
+// Lista todos los formatos disponibles
 const listar = async (req, res) => {
     try {
         const formatos = await formatoModelo.obtenerTodos();
@@ -17,7 +17,7 @@ const listar = async (req, res) => {
     }
 };
 
-// Crea un formato nuevo directamente desde el editor (sin archivo Word)
+// Crea un formato nuevo desde el editor (sin Word)
 const crearVacio = async (req, res) => {
     try {
         const { nombre, tipo, contenido_html } = req.body;
@@ -25,7 +25,7 @@ const crearVacio = async (req, res) => {
             return res.status(400).json({ exito: false, mensaje: 'El nombre es obligatorio' });
         }
         const formato = await formatoModelo.crear(nombre.trim(), tipo || 'apoyo', contenido_html || '');
-        res.json({ exito: true, mensaje: `Formato "${formato.nombre}" creado correctamente`, datos: formato });
+        res.json({ exito: true, mensaje: `Formato "${formato.nombre}" creado`, datos: formato });
     } catch (error) {
         console.error('Error al crear formato vacío:', error);
         res.status(500).json({ exito: false, mensaje: 'Error al crear formato' });
@@ -45,7 +45,7 @@ const obtenerDetalle = async (req, res) => {
     }
 };
 
-// Sube un archivo Word (.docx), lo convierte a HTML y lo guarda en la base de datos
+// Sube un Word → Google Drive lo convierte → HTML de alta fidelidad (logo, tablas, imágenes)
 const subirDesdeWord = async (req, res) => {
     try {
         if (!req.file) {
@@ -57,41 +57,31 @@ const subirDesdeWord = async (req, res) => {
             return res.status(400).json({ exito: false, mensaje: 'El nombre del formato es obligatorio' });
         }
 
-        // Convierte el Word a HTML preservando tablas, texto E IMÁGENES (base64)
-        const resultado = await mammoth.convertToHtml(
-            { buffer: req.file.buffer },
-            {
-                convertImage: mammoth.images.imgElement(function(image) {
-                    return image.read('base64').then(function(datos) {
-                        return { src: 'data:' + image.contentType + ';base64,' + datos };
-                    });
-                })
-            }
+        // Google Drive: sube el Word, lo convierte a Google Docs, exporta como HTML
+        const { googleDocId, htmlContent } = await googleDrive.subirWordYConvertir(
+            req.file.buffer,
+            nombre.trim()
         );
-        const htmlConvertido = resultado.value;
 
-        if (!htmlConvertido || htmlConvertido.trim() === '') {
+        if (!htmlContent || htmlContent.trim() === '') {
             return res.status(400).json({ exito: false, mensaje: 'No se pudo extraer contenido del archivo Word' });
         }
 
         const formato = await formatoModelo.crear(
             nombre.trim(),
             tipo || 'apoyo',
-            htmlConvertido
+            htmlContent,
+            googleDocId
         );
 
-        res.json({
-            exito: true,
-            mensaje: `Formato "${formato.nombre}" cargado correctamente`,
-            datos: formato
-        });
+        res.json({ exito: true, mensaje: `Formato "${formato.nombre}" cargado correctamente`, datos: formato });
     } catch (error) {
         console.error('Error al subir formato Word:', error);
-        res.status(500).json({ exito: false, mensaje: 'Error al procesar el archivo Word' });
+        res.status(500).json({ exito: false, mensaje: 'Error al procesar el archivo Word con Google Drive' });
     }
 };
 
-// Guarda los cambios del editor (HTML editado manualmente en el navegador)
+// Guarda los cambios del editor
 const guardarEdicion = async (req, res) => {
     try {
         const { id } = req.params;
@@ -111,12 +101,18 @@ const guardarEdicion = async (req, res) => {
     }
 };
 
-// Elimina un formato del sistema
+// Elimina un formato del sistema (y de Google Drive si aplica)
 const eliminar = async (req, res) => {
     try {
         const { id } = req.params;
         const formato = await formatoModelo.eliminar(id);
         if (!formato) return res.status(404).json({ exito: false, mensaje: 'Formato no encontrado' });
+
+        // Si tiene ID en Google Drive, eliminarlo también
+        if (formato.google_doc_id) {
+            await googleDrive.eliminarArchivo(formato.google_doc_id);
+        }
+
         res.json({ exito: true, mensaje: `Formato "${formato.nombre}" eliminado` });
     } catch (error) {
         console.error('Error al eliminar formato:', error);
