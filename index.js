@@ -97,6 +97,10 @@ app.get('/bienestar/estudiantes', (req, res) => {
     res.sendFile(path.join(__dirname, 'cliente', 'bienestar', 'panel', 'estudiantes.html'));
 });
 
+app.get('/bienestar/alertas', (req, res) => {
+    res.sendFile(path.join(__dirname, 'cliente', 'bienestar', 'panel', 'alertas.html'));
+});
+
 app.get('/bienestar/configuracion', (req, res) => {
     res.sendFile(path.join(__dirname, 'cliente', 'bienestar', 'panel', 'configuracion.html'));
 });
