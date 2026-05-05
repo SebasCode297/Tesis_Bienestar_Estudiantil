@@ -1,17 +1,15 @@
 /* 
 =============================================
-SISTEMA DE DISEÑO - PANEL DE BIENESTAR
+SISTEMA DE DISEÑO - PANEL DE BIENESTAR (MASTER)
 =============================================
-Este archivo define la estética 'Premium' del sistema.
-Usa variables CSS para facilitar cambios globales.
 */
 
 :root {
-    --primary-color: #0f172a;       /* Azul marino profundo (Elegancia) */
-    --accent-color: #f59e0b;        /* Dorado/Ámbar (ISTPET) */
-    --bg-light: #f8fafc;            /* Fondo gris muy claro */
-    --card-bg: rgba(255, 255, 255, 0.8); /* Blanco con transparencia para Glassmorphism */
-    --text-main: #1e293b;           /* Texto oscuro principal */
+    --primary-color: #0f172a;
+    --accent-color: #f59e0b;
+    --bg-light: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
     --sidebar-width: 260px;
     --border-radius: 16px;
     --transition: all 0.3s ease;
@@ -21,29 +19,31 @@ Usa variables CSS para facilitar cambios globales.
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', sans-serif; /* Tipografía moderna y legible */
+    font-family: 'Inter', sans-serif;
 }
 
 body {
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-    background-attachment: fixed;
+    background: #f1f5f9;
     color: var(--text-main);
     overflow-x: hidden;
-    display: flex;
 }
 
-/* =============================================
-MENU LATERAL (SIDEBAR)
-============================================= */
+/* CONTENEDOR PADRE - USAR FLEX PARA ALINEAR SIDEBAR Y CONTENIDO */
+.panel-container {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* SIDEBAR FIJO */
 .sidebar {
     width: var(--sidebar-width);
-    height: 100vh;
     background: var(--primary-color);
     color: white;
     position: fixed;
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
     z-index: 100;
 }
 
@@ -53,25 +53,16 @@ MENU LATERAL (SIDEBAR)
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-.sidebar-header h2 {
-    font-size: 1.2rem;
-    color: var(--accent-color);
-    letter-spacing: 1px;
-}
+.sidebar-header h2 { font-size: 1.2rem; color: var(--accent-color); }
 
-.menu-links {
-    flex: 1;
-    padding: 20px 0;
-}
-
+.menu-links { flex: 1; padding: 20px 0; }
 .menu-item {
     padding: 15px 25px;
     display: flex;
     align-items: center;
-    cursor: pointer;
-    transition: var(--transition);
     color: #94a3b8;
     text-decoration: none;
+    transition: var(--transition);
 }
 
 .menu-item:hover, .menu-item.active {
@@ -80,19 +71,14 @@ MENU LATERAL (SIDEBAR)
     border-left: 4px solid var(--accent-color);
 }
 
-.menu-item i {
-    margin-right: 15px;
-    font-size: 1.1rem;
-}
-
-/* =============================================
-CONTENIDO PRINCIPAL
-============================================= */
+/* CONTENIDO PRINCIPAL - EL QUE DEBE ESTAR "CUADRADO" */
 .main-content {
-    margin-left: var(--sidebar-width);
-    width: calc(100% - var(--sidebar-width));
-    padding: 30px;
+    margin-left: var(--sidebar-width); /* Deja espacio para el sidebar */
+    width: calc(100% - var(--sidebar-width)); /* Ocupa TODO el resto */
+    padding: 40px;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .header-top {
@@ -102,68 +88,27 @@ CONTENIDO PRINCIPAL
     margin-bottom: 40px;
 }
 
-.welcome-text h1 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--primary-color);
-}
+.welcome-text h1 { font-size: 1.8rem; font-weight: 800; color: var(--primary-color); }
 
-.welcome-text p {
-    color: #64748b;
-}
-
-/* =============================================
-TARJETAS DE RESUMEN (DASHBOARD)
-============================================= */
+/* GRID DE TARJETAS - SIEMPRE 4 COLUMNAS */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 25px;
     margin-bottom: 40px;
 }
 
 .stat-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(10px); /* Efecto cristal */
-    border: 1px solid rgba(255,255,255,0.3);
+    background: white;
     padding: 25px;
     border-radius: var(--border-radius);
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
-    transition: var(--transition);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
 }
 
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-}
+.stat-value { font-size: 2rem; font-weight: 800; color: var(--primary-color); display: block; }
+.stat-label { color: #64748b; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
 
-.stat-icon {
-    width: 50px;
-    height: 50px;
-    background: #eff6ff;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #3b82f6;
-    margin-bottom: 15px;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--primary-color);
-}
-
-.stat-label {
-    color: #64748b;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-/* =============================================
-CONTENEDORES DE GRÁFICOS Y TABLAS
-============================================= */
+/* CONTENEDORES DE CONTENIDO (TABLAS Y GRÁFICOS) */
 .content-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -175,13 +120,29 @@ CONTENEDORES DE GRÁFICOS Y TABLAS
     border-radius: var(--border-radius);
     padding: 25px;
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    width: 100%;
 }
 
 .panel-title {
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 20px;
+    color: var(--primary-color);
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
+}
+
+/* TABLAS ESTANDARIZADAS */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th { text-align: left; padding: 15px; background: #f8fafc; color: #64748b; font-size: 0.85rem; border-bottom: 1px solid #f1f5f9; }
+td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+
+@media (max-width: 1200px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .content-grid { grid-template-columns: 1fr; }
 }

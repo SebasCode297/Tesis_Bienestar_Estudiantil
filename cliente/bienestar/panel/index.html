@@ -7,60 +7,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/bienestar/panel/estilos/panel.css">
-    <style>
-        /* CSS PARA DEJAR LA PÁGINA BIEN CUADRADA AL 100% DE ANCHO */
-        .main-content {
-            width: calc(100% - 260px) !important;
-            max-width: none !important;
-            padding: 30px !important;
-            margin-left: 260px !important;
-            box-sizing: border-box;
-        }
-
-        .stats-grid {
-            display: grid !important;
-            grid-template-columns: repeat(4, 1fr) !important; /* Fuerza 4 columnas */
-            gap: 20px !important;
-            width: 100% !important;
-            margin-bottom: 30px !important;
-        }
-
-        .content-grid {
-            display: grid !important;
-            grid-template-columns: 1.8fr 1.2fr !important; /* Distribuye el ancho entre tabla y gráfico */
-            gap: 25px !important;
-            width: 100% !important;
-        }
-
-        .panel-box {
-            width: 100% !important;
-            background: white;
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            min-height: 400px;
-            box-sizing: border-box;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            text-align: left;
-        }
-
-        .stat-value { font-size: 2.2rem; font-weight: 800; color: #0f172a; display: block; }
-        .stat-label { color: #64748b; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        @media (max-width: 1200px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-            .content-grid { grid-template-columns: 1fr !important; }
-        }
-    </style>
 </head>
 <body>
-    <div class="panel-container" style="display: flex; width: 100%;">
+    <div class="panel-container">
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -74,19 +23,19 @@
                 <a href="/bienestar/reportes" class="menu-item"><span>Reportes e Indicadores</span></a>
                 <a href="/bienestar/configuracion" class="menu-item"><span>Configuración Formatos</span></a>
             </nav>
-            <div class="sidebar-footer" style="padding: 20px; margin-top: auto;">
+            <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
                 <a href="/bienestar/cerrar-sesion" class="menu-item" style="color: #f87171;"><span>Cerrar Sesión</span></a>
             </div>
         </aside>
 
-        <!-- CONTENIDO PRINCIPAL -->
+        <!-- CONTENIDO -->
         <main class="main-content">
-            <header class="header-top" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; width: 100%;">
+            <header class="header-top">
                 <div class="welcome-text">
-                    <h1 style="font-size: 1.8rem; font-weight: 800; color: #0f172a; margin: 0;">Panel de Gestión y Control</h1>
-                    <p style="color: #64748b; margin: 5px 0 0;">Bienvenido, Administrador de Bienestar Estudiantil</p>
+                    <h1>Panel de Gestión y Control</h1>
+                    <p>Bienvenido, Administrador de Bienestar Estudiantil</p>
                 </div>
-                <div id="current-date" style="color: #0f172a; font-weight: 700; background: #f1f5f9; padding: 12px 20px; border-radius: 12px;"></div>
+                <div id="current-date"></div>
             </header>
 
             <section class="stats-grid">
@@ -110,17 +59,17 @@
 
             <div class="content-grid">
                 <div class="panel-box">
-                    <div class="panel-title" style="font-weight: 700; color: #0f172a; margin-bottom: 25px; display: flex; justify-content: space-between;">
+                    <div class="panel-title">
                         Alertas Recientes 
-                        <a href="/bienestar/alertas" style="font-size: 0.8rem; color: #3b82f6; text-decoration: none; font-weight: 400;">Ver todo</a>
+                        <a href="/bienestar/alertas" style="font-size: 0.8rem; color: var(--accent-color); text-decoration: none;">Ver todo</a>
                     </div>
                     <div id="lista-alertas-recientes">
-                        <p style="color: #94a3b8; text-align: center; padding: 60px;">Cargando información del servidor...</p>
+                        <p style="color: #94a3b8; text-align: center; padding: 20px;">Cargando información...</p>
                     </div>
                 </div>
 
                 <div class="panel-box">
-                    <div class="panel-title" style="font-weight: 700; color: #0f172a; margin-bottom: 25px;">Distribución por Carrera</div>
+                    <div class="panel-title">Distribución por Carrera</div>
                     <div style="height: 250px; display: flex; align-items: center; justify-content: center; color: #cbd5e1; background: #f8fafc; border-radius: 12px;">
                         (Gráfico Estadístico)
                     </div>
@@ -133,43 +82,34 @@
         document.addEventListener('DOMContentLoaded', () => {
             const dateBox = document.getElementById('current-date');
             dateBox.innerText = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            
-            // Cargar datos
-            fetch('/bienestar/api/reportes/estadisticas')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.exito) {
-                        const d = data.datos;
-                        document.getElementById('stat-total-alumnos').innerText = d.totalEstudiantes || 0;
-                        document.getElementById('stat-alertas-criticas').innerText = d.alertas ? d.alertas.pendientes : 0;
-                        document.getElementById('stat-casos-resueltos').innerText = d.alertas ? d.alertas.resueltas : 0;
-                        document.getElementById('stat-en-proceso').innerText = d.alertas ? d.alertas.en_proceso : 0;
-
-                        const container = document.getElementById('lista-alertas-recientes');
-                        if (d.recientes && d.recientes.length > 0) {
-                            container.innerHTML = '';
-                            d.recientes.forEach(alerta => {
-                                const item = document.createElement('div');
-                                item.style = "padding: 18px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;";
-                                item.innerHTML = `
-                                    <div>
-                                        <strong style="color: #0f172a;">${alerta.apellidos} ${alerta.nombres}</strong><br>
-                                        <small style="color: #64748b;">${alerta.motivo}</small>
-                                    </div>
-                                    <span style="font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 6px; background: ${alerta.estado === 'Pendiente' ? '#fee2e2' : '#fef3c7'}; color: ${alerta.estado === 'Pendiente' ? '#b91c1c' : '#b45309'};">${alerta.estado}</span>
-                                `;
-                                container.appendChild(item);
-                            });
-                        } else {
-                            container.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 60px;">No hay alertas pendientes.</p>';
-                        }
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    document.getElementById('lista-alertas-recientes').innerHTML = '<p style="color: #ef4444; text-align: center; padding: 60px;">Error de conexión.</p>';
-                });
+            cargarDatos();
         });
+
+        async function cargarDatos() {
+            const container = document.getElementById('lista-alertas-recientes');
+            try {
+                const res = await fetch('/bienestar/api/reportes/estadisticas');
+                const data = await res.json();
+                if (data.exito) {
+                    const d = data.datos;
+                    document.getElementById('stat-total-alumnos').innerText = d.totalEstudiantes || 0;
+                    document.getElementById('stat-alertas-criticas').innerText = d.alertas ? d.alertas.pendientes : 0;
+                    document.getElementById('stat-casos-resueltos').innerText = d.alertas ? d.alertas.resueltas : 0;
+                    document.getElementById('stat-en-proceso').innerText = d.alertas ? d.alertas.en_proceso : 0;
+                    if (d.recientes && d.recientes.length > 0) {
+                        container.innerHTML = '';
+                        d.recientes.forEach(alerta => {
+                            const item = document.createElement('div');
+                            item.style = "padding: 15px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;";
+                            item.innerHTML = `<div><strong>${alerta.apellidos} ${alerta.nombres}</strong><br><small style="color: #64748b;">${alerta.motivo}</small></div><span style="font-size: 0.8rem; font-weight: 700; color: ${alerta.estado === 'Pendiente' ? '#ef4444' : '#f59e0b'};">${alerta.estado}</span>`;
+                            container.appendChild(item);
+                        });
+                    } else {
+                        container.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">No hay alertas registradas aún.</p>';
+                    }
+                }
+            } catch (error) { console.error(error); }
+        }
     </script>
 </body>
 </html>
