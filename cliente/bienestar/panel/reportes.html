@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reportes e Indicadores | Bienestar Estudiantil</title>
-    <link rel="stylesheet" href="../../estilos/principal.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/bienestar/panel/estilos/panel.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .stats-grid {
@@ -28,24 +27,8 @@
 
         .stat-card:hover { transform: translateY(-5px); }
 
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
         .stat-info h3 { font-size: 28px; margin: 0; color: #1e293b; }
         .stat-info p { margin: 0; color: #64748b; font-size: 14px; }
-
-        /* Colores de las tarjetas */
-        .bg-blue { background: #e0f2fe; color: #0369a1; }
-        .bg-orange { background: #ffedd5; color: #c2410c; }
-        .bg-green { background: #dcfce7; color: #15803d; }
-        .bg-purple { background: #f3e8ff; color: #7e22ce; }
 
         .charts-container {
             display: grid;
@@ -85,8 +68,8 @@
 </head>
 <body>
     <div class="panel-container">
-        <!-- Sidebar se carga dinámicamente -->
-        <aside class="sidebar" id="sidebar">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>ISTPET</h2>
                 <small>Bienestar Estudiantil</small>
@@ -110,20 +93,20 @@
             </nav>
             <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
                 <a href="/bienestar/cerrar-sesion" class="menu-item" style="color: #f87171;">
-                    <span><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</span>
+                    <span>Cerrar Sesión</span>
                 </a>
             </div>
         </aside>
 
-        <main class="content">
-            <header class="content-header">
-                <div class="header-info">
+        <main class="main-content">
+            <header class="header-top" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <div class="welcome-text">
                     <h1>Reportes e Indicadores</h1>
                     <p>Resumen analítico de la gestión de Bienestar Estudiantil</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn-primary" onclick="window.print()">
-                        <i class="fas fa-download"></i> Exportar PDF
+                    <button onclick="window.print()" style="padding: 10px 20px; background: #1e2a6e; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        Exportar PDF
                     </button>
                 </div>
             </header>
@@ -138,6 +121,7 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-info">
+                        <h3 id="stat-alertas">0</h3>
                         <h3 id="stat-alertas">0</h3>
                         <p>Alertas Totales</p>
                     </div>
