@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const alertasControlador = require('../controladores/alertas');
 
-// Middleware para verificar sesión (asumo que está en autenticacion)
-const { verificarSesion } = require('./autenticacion');
+// Importa el middleware que protege rutas privadas
+const { verificarSesion } = require('../middlewares/verificarSesion');
 
 // Todas las rutas de alertas requieren que el usuario esté logueado
 router.get('/', verificarSesion, alertasControlador.listar);
