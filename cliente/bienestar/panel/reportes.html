@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes e Indicadores | Bienestar Estudiantil</title>
+    <link rel="stylesheet" href="../../estilos/principal.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover { transform: translateY(-5px); }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-info h3 { font-size: 28px; margin: 0; color: #1e293b; }
+        .stat-info p { margin: 0; color: #64748b; font-size: 14px; }
+
+        /* Colores de las tarjetas */
+        .bg-blue { background: #e0f2fe; color: #0369a1; }
+        .bg-orange { background: #ffedd5; color: #c2410c; }
+        .bg-green { background: #dcfce7; color: #15803d; }
+        .bg-purple { background: #f3e8ff; color: #7e22ce; }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .chart-box {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .chart-box h2 { font-size: 18px; margin-bottom: 20px; color: #334155; }
+
+        .recent-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .recent-table th { text-align: left; padding: 12px; color: #64748b; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+        .recent-table td { padding: 16px 12px; font-size: 14px; border-bottom: 1px solid #f1f5f9; }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-pend { background: #fee2e2; color: #b91c1c; }
+        .badge-proc { background: #fef3c7; color: #b45309; }
+        .badge-resu { background: #dcfce7; color: #15803d; }
+    </style>
+</head>
+<body>
+    <div class="panel-container">
+        <!-- Sidebar se carga dinámicamente -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>ISTPET</h2>
+                <small>Bienestar Estudiantil</small>
+            </div>
+            <nav class="menu-links">
+                <a href="/bienestar/panel" class="menu-item">
+                    <span><i class="fas fa-home"></i> Inicio / Dashboard</span>
+                </a>
+                <a href="/bienestar/estudiantes" class="menu-item">
+                    <span><i class="fas fa-users"></i> Gestión Estudiantil</span>
+                </a>
+                <a href="/bienestar/alertas" class="menu-item">
+                    <span><i class="fas fa-exclamation-triangle"></i> Alertas Tempranas</span>
+                </a>
+                <a href="/bienestar/reportes" class="menu-item active">
+                    <span><i class="fas fa-chart-pie"></i> Reportes e Indicadores</span>
+                </a>
+                <a href="/bienestar/configuracion" class="menu-item">
+                    <span><i class="fas fa-file-word"></i> Configuración Formatos</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
+                <a href="/bienestar/cerrar-sesion" class="menu-item" style="color: #f87171;">
+                    <span><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="content">
+            <header class="content-header">
+                <div class="header-info">
+                    <h1>Reportes e Indicadores</h1>
+                    <p>Resumen analítico de la gestión de Bienestar Estudiantil</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-primary" onclick="window.print()">
+                        <i class="fas fa-download"></i> Exportar PDF
+                    </button>
+                </div>
+            </header>
+
+            <!-- Tarjetas de Resumen -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <h3 id="stat-estudiantes">0</h3>
+                        <p>Estudiantes</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-orange"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="stat-info">
+                        <h3 id="stat-alertas">0</h3>
+                        <p>Alertas Totales</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-green"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <h3 id="stat-resueltas">0</h3>
+                        <p>Casos Resueltos</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon bg-purple"><i class="fas fa-file-alt"></i></div>
+                    <div class="stat-info">
+                        <h3 id="stat-formatos">0</h3>
+                        <p>Plantillas Word</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos y Actividad -->
+            <div class="charts-container">
+                <div class="chart-box">
+                    <h2>Estado de las Alertas</h2>
+                    <canvas id="chartAlertas"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h2>Actividad Reciente (Últimas Alertas)</h2>
+                    <table class="recent-table">
+                        <thead>
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>Motivo</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-recientes">
+                            <!-- Se llena por JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../../js/auth.js"></script>
+    <script src="js/reportes.js"></script>
+</body>
+</html>

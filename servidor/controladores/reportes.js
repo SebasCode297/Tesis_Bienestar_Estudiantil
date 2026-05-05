@@ -9,10 +9,10 @@ const estudianteModelo = require('../modelos/estudiante');
 // Estadísticas generales del sistema para el Dashboard principal
 const estadisticasGenerales = async (req, res) => {
     try {
-        // Total de estudiantes registrados en el sistema
+        // 1. Total de estudiantes
         const totalEstudiantes = await pool.query('SELECT COUNT(*) FROM estudiantes');
 
-        // Conteo de alertas por estado (Pendiente, En Proceso, Resuelto)
+        // 2. Conteo de alertas por estado
         const alertasStats = await pool.query(`
             SELECT 
                 COUNT(*) as total,
@@ -22,11 +22,25 @@ const estadisticasGenerales = async (req, res) => {
             FROM alertas_tempranas
         `);
 
+        // 3. Total de formatos configurados
+        const totalFormatos = await pool.query('SELECT COUNT(*) FROM formatos');
+
+        // 4. Últimas 5 alertas (Actividad reciente)
+        const alertasRecientes = await pool.query(`
+            SELECT a.id, a.motivo, a.estado, a.creado_en, e.nombres, e.apellidos
+            FROM alertas_tempranas a
+            JOIN estudiantes e ON a.estudiante_id = e.id
+            ORDER BY a.creado_en DESC
+            LIMIT 5
+        `);
+
         res.json({
             exito: true,
             datos: {
                 totalEstudiantes: parseInt(totalEstudiantes.rows[0].count),
-                alertas: alertasStats.rows[0]
+                totalFormatos: parseInt(totalFormatos.rows[0].count),
+                alertas: alertasStats.rows[0],
+                recientes: alertasRecientes.rows
             }
         });
     } catch (error) {
