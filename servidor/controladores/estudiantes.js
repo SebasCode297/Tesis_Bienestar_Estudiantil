@@ -79,6 +79,16 @@ const cargarDesdeExcel = async (req, res) => {
             return res.status(400).json({ exito: false, mensaje: 'No se encontraron datos válidos en el archivo' });
         }
 
+        const resultado = await pool.query(
+            `SELECT id, nombres, apellidos, cedula 
+             FROM estudiantes 
+             WHERE cedula LIKE $1 
+             OR apellidos ILIKE $1 
+             OR nombres ILIKE $1 
+             LIMIT 5`,
+            [`%${q}%`]
+        );
+
         const resultados = await estudianteModelo.upsertMasivo(estudiantesValidos);
 
         res.json({
