@@ -3,115 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Bienestar | ISTPET</title>
-    
-    <!-- Fuentes y Iconos -->
+    <title>Panel de Gestión | Bienestar Estudiantil</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Estilos Personalizados -->
     <link rel="stylesheet" href="/bienestar/panel/estilos/panel.css">
 </head>
 <body>
-
-    <!-- =============================================
-         MENÚ LATERAL (SIDEBAR)
-    ============================================== -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2>ISTPET</h2>
-            <small>Bienestar Estudiantil</small>
-        </div>
-        
-        <nav class="menu-links">
-            <a href="/bienestar/panel" class="menu-item active">
-                <span>Inicio / Dashboard</span>
-            </a>
-            <a href="/bienestar/estudiantes" class="menu-item">
-                <span>Gestión Estudiantil</span>
-            </a>
-            <a href="/bienestar/alertas" class="menu-item">
-                <span>Alertas Tempranas</span>
-            </a>
-            <a href="/bienestar/reportes" class="menu-item">
-                <span>Reportes e Indicadores</span>
-            </a>
-            <a href="/bienestar/configuracion" class="menu-item">
-                <span>Configuración Formatos</span>
-            </a>
-        </nav>
-
-        <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
-            <a href="/bienestar/cerrar-sesion" class="menu-item" style="color: #f87171;">
-                <span>Cerrar Sesión</span>
-            </a>
-        </div>
-    </aside>
-
-    <!-- =============================================
-         CONTENIDO PRINCIPAL
-    ============================================== -->
-    <main class="main-content">
-        
-        <!-- Cabecera de bienvenida -->
-        <header class="header-top">
-            <div class="welcome-text">
-                <h1>Panel de Gestión y Control</h1>
-                <p>Bienvenido, Administrador de Bienestar Estudiantil</p>
+    <div class="panel-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>ISTPET</h2>
+                <small>Bienestar Estudiantil</small>
             </div>
-            <div class="user-profile" style="display: flex; align-items: center; gap: 15px;">
-                <div class="date-now" id="current-date" style="font-weight: 600; color: #64748b;"></div>
-                <div class="avatar" style="width: 45px; height: 45px; border-radius: 50%; background: #ddd; border: 2px solid var(--accent-color);"></div>
+            <nav class="menu-links">
+                <a href="/bienestar/panel" class="menu-item active"><span>Inicio / Dashboard</span></a>
+                <a href="/bienestar/estudiantes" class="menu-item"><span>Gestión Estudiantil</span></a>
+                <a href="/bienestar/alertas" class="menu-item"><span>Alertas Tempranas</span></a>
+                <a href="/bienestar/reportes" class="menu-item"><span>Reportes e Indicadores</span></a>
+                <a href="/bienestar/configuracion" class="menu-item"><span>Configuración Formatos</span></a>
+            </nav>
+            <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
+                <a href="/bienestar/cerrar-sesion" class="menu-item" style="color: #f87171;"><span>Cerrar Sesión</span></a>
             </div>
-        </header>
+        </aside>
 
-        <!-- Sección de Estadísticas en vivo -->
-        <section class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value" id="stat-total-alumnos">0</div>
-                <div class="stat-label">Alumnos Monitoreados</div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-value" id="stat-alertas-criticas">0</div>
-                <div class="stat-label">Alertas Críticas</div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-value" id="stat-casos-resueltos">0</div>
-                <div class="stat-label">Casos Resueltos</div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-value" id="stat-en-proceso">0</div>
-                <div class="stat-label">En Intervención</div>
-            </div>
-        </section>
-
-        <!-- Cuadros de información detallada -->
-        <div class="content-grid">
-            <div class="panel-box">
-                <div class="panel-title">
-                    <span>Alertas Recientes</span>
-                    <button style="border: none; background: none; color: var(--accent-color); cursor: pointer; font-weight: 600;">Ver todo</button>
+        <!-- CONTENIDO -->
+        <main class="main-content">
+            <header class="header-top">
+                <div class="welcome-text">
+                    <h1>Panel de Gestión y Control</h1>
+                    <p>Bienvenido, Administrador de Bienestar Estudiantil</p>
                 </div>
-                <div id="lista-alertas-recientes">
-                    <p style="color: #94a3b8; text-align: center; padding: 20px;">Cargando datos del servidor...</p>
+                <div id="current-date" style="color: #64748b; font-weight: 600;"></div>
+            </header>
+
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total-alumnos">0</div>
+                    <div class="stat-label">Alumnos Monitoreados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-alertas-criticas">0</div>
+                    <div class="stat-label">Alertas Críticas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-casos-resueltos">0</div>
+                    <div class="stat-label">Casos Resueltos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-en-proceso">0</div>
+                    <div class="stat-label">En Intervención</div>
+                </div>
+            </section>
+
+            <div class="content-grid">
+                <div class="panel-box">
+                    <div class="panel-title">Alertas Recientes <a href="/bienestar/alertas" style="font-size: 0.8rem; color: var(--accent-color); text-decoration: none;">Ver todo</a></div>
+                    <div id="lista-alertas-recientes">
+                        <p style="color: #94a3b8; text-align: center; padding: 20px;">Cargando datos del servidor...</p>
+                    </div>
+                </div>
+
+                <div class="panel-box">
+                    <div class="panel-title">Distribución por Carrera</div>
+                    <div style="height: 200px; display: flex; align-items: center; justify-content: center; color: #cbd5e1;">
+                        (Gráfico Estadístico)
+                    </div>
                 </div>
             </div>
+        </main>
+    </div>
 
-            <div class="panel-box">
-                <div class="panel-title">Distribución por Carrera</div>
-                <div id="chart-carreras" style="height: 200px; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
-                    (Gráfico Estadístico)
-                </div>
-            </div>
-        </div>
+    <script>
+        // Lógica embebida para evitar problemas de caché
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateBox = document.getElementById('current-date');
+            dateBox.innerText = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            cargarDatos();
+        });
 
-    </main>
+        async function cargarDatos() {
+            const container = document.getElementById('lista-alertas-recientes');
+            try {
+                const res = await fetch('/bienestar/api/reportes/estadisticas');
+                const data = await res.json();
 
-    <!-- Script de Lógica con Cache Buster para forzar actualización -->
-    <script src="/bienestar/panel/js/panel.js?v=1.0.2"></script>
+                if (data.exito) {
+                    const { totalEstudiantes, alertas, recientes } = data.datos;
+                    
+                    document.getElementById('stat-total-alumnos').innerText = totalEstudiantes || 0;
+                    document.getElementById('stat-alertas-criticas').innerText = alertas ? alertas.pendientes : 0;
+                    document.getElementById('stat-casos-resueltos').innerText = alertas ? alertas.resueltas : 0;
+                    document.getElementById('stat-en-proceso').innerText = alertas ? alertas.en_proceso : 0;
+
+                    if (recientes && recientes.length > 0) {
+                        container.innerHTML = '';
+                        recientes.forEach(alerta => {
+                            const item = document.createElement('div');
+                            item.style = "padding: 15px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;";
+                            item.innerHTML = `
+                                <div>
+                                    <strong>${alerta.apellidos} ${alerta.nombres}</strong><br>
+                                    <small style="color: #64748b;">${alerta.motivo}</small>
+                                </div>
+                                <span style="font-size: 0.8rem; font-weight: 700; color: ${alerta.estado === 'Pendiente' ? '#ef4444' : '#f59e0b'};">${alerta.estado}</span>
+                            `;
+                            container.appendChild(item);
+                        });
+                    } else {
+                        container.innerHTML = '<p style="color: #94a3b8; text-align: center; padding: 20px;">No hay alertas registradas aún.</p>';
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = '<p style="color: #ef4444; text-align: center; padding: 20px;">Error al cargar datos del servidor.</p>';
+            }
+        }
+    </script>
 </body>
 </html>
