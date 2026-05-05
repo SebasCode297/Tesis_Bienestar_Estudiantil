@@ -12,7 +12,8 @@ const { verificarSesion } = require('../middlewares/verificarSesion');
 // =============================================
 
 // GET /bienestar/api/reportes/estadisticas — Totales generales
-router.get('/estadisticas', verificarSesion, reportesControlador.estadisticasGenerales);
+// Ruta de estadísticas (sin sesión temporalmente para diagnóstico)
+router.get('/estadisticas', reportesControlador.estadisticasGenerales);
 
 // GET /bienestar/api/reportes/estudiante/:id — Reporte individual
 router.get('/estudiante/:id', verificarSesion, reportesControlador.reporteEstudiante);
