@@ -101,6 +101,10 @@ app.get('/bienestar/configuracion', (req, res) => {
     res.sendFile(path.join(__dirname, 'cliente', 'bienestar', 'panel', 'configuracion.html'));
 });
 
+app.get('/bienestar/reportes', (req, res) => {
+    res.sendFile(path.join(__dirname, 'cliente', 'bienestar', 'panel', 'reportes.html'));
+});
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'cliente', 'inicio', 'index.html'));
 });
