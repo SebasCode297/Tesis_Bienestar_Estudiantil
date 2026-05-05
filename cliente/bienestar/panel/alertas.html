@@ -8,217 +8,160 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/bienestar/panel/estilos/panel.css">
     <style>
-        .actions-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        }
-
-        .search-box {
-            display: flex;
-            gap: 10px;
-            flex: 1;
-            max-width: 400px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            outline: none;
-        }
-
-        .btn-new {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
+        .actions-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .search-box { display: flex; gap: 10px; flex: 1; max-width: 400px; }
+        .search-box input { width: 100%; padding: 10px 15px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; }
+        .btn-new { background: var(--primary-color); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: var(--transition); }
         .btn-new:hover { background: var(--accent-color); }
-
-        .alerts-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
+        .alerts-table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .alerts-table th { text-align: left; padding: 15px; background: #f8fafc; color: #64748b; font-size: 0.85rem; border-bottom: 1px solid #f1f5f9; }
         .alerts-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
-
-        .badge {
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        .priority-alta { color: #ef4444; border: 1px solid #ef4444; }
-        .priority-media { color: #f59e0b; border: 1px solid #f59e0b; }
-        .priority-baja { color: #10b981; border: 1px solid #10b981; }
-
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
         .status-pend { background: #fee2e2; color: #b91c1c; }
         .status-proc { background: #fef3c7; color: #b45309; }
         .status-resu { background: #dcfce7; color: #15803d; }
 
-        /* Modal simple */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-        }
-
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #334155; }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            outline: none;
-        }
-
-        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 30px; }
-        .btn-cancel { background: #f1f5f9; color: #64748b; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
-        
-        #results-box {
-            position: absolute;
-            background: white;
-            width: 100%;
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            z-index: 10;
-            display: none;
-        }
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 500px; }
+        .form-group { margin-bottom: 20px; position: relative; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        #results-box { position: absolute; background: white; width: 100%; max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; z-index: 10; display: none; }
         .result-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
         .result-item:hover { background: #f8fafc; }
     </style>
 </head>
 <body>
+    <div class="panel-container">
+        <aside class="sidebar">
+            <div class="sidebar-header"><h2>ISTPET</h2><small>Bienestar Estudiantil</small></div>
+            <nav class="menu-links">
+                <a href="/bienestar/panel" class="menu-item"><span>Inicio / Dashboard</span></a>
+                <a href="/bienestar/estudiantes" class="menu-item"><span>Gestión Estudiantil</span></a>
+                <a href="/bienestar/alertas" class="menu-item active"><span>Alertas Tempranas</span></a>
+                <a href="/bienestar/reportes" class="menu-item"><span>Reportes e Indicadores</span></a>
+                <a href="/bienestar/configuracion" class="menu-item"><span>Configuración Formatos</span></a>
+            </nav>
+        </aside>
 
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2>ISTPET</h2>
-            <small>Bienestar Estudiantil</small>
-        </div>
-        <nav class="menu-links">
-            <a href="/bienestar/panel" class="menu-item"><span>Inicio / Dashboard</span></a>
-            <a href="/bienestar/estudiantes" class="menu-item"><span>Gestión Estudiantil</span></a>
-            <a href="/bienestar/alertas" class="menu-item active"><span>Alertas Tempranas</span></a>
-            <a href="/bienestar/reportes" class="menu-item"><span>Reportes e Indicadores</span></a>
-            <a href="/bienestar/configuracion" class="menu-item"><span>Configuración Formatos</span></a>
-        </nav>
-        <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
-            <a href="/bienestar/cerrar-sesion" class="menu-item" style="color: #f87171;"><span>Cerrar Sesión</span></a>
-        </div>
-    </aside>
+        <main class="main-content">
+            <header class="header-top">
+                <div class="welcome-text"><h1>Alertas Tempranas</h1><p>Identificación y seguimiento de casos estudiantiles</p></div>
+                <button class="btn-new" onclick="abrirModal()">Nueva Alerta</button>
+            </header>
 
-    <main class="main-content">
-        <header class="header-top">
-            <div class="welcome-text">
-                <h1>Alertas Tempranas</h1>
-                <p>Identificación y seguimiento de casos estudiantiles</p>
-            </div>
-            <button class="btn-new" onclick="abrirModal()">Nueva Alerta</button>
-        </header>
+            <table class="alerts-table">
+                <thead>
+                    <tr><th>Estudiante</th><th>Motivo</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr>
+                </thead>
+                <tbody id="tbody-alertas">
+                    <tr><td colspan="5" style="text-align: center; padding: 20px;">Cargando alertas...</td></tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
 
-        <div class="actions-bar">
-            <div class="search-box">
-                <input type="text" id="filtro-alertas" placeholder="Filtrar por estudiante o motivo..." onkeyup="filtrarTabla()">
-            </div>
-        </div>
-
-        <table class="alerts-table">
-            <thead>
-                <tr>
-                    <th>Estudiante</th>
-                    <th>Motivo</th>
-                    <th>Prioridad</th>
-                    <th>Estado</th>
-                    <th>Fecha</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="tbody-alertas">
-                <!-- Se llena por JS -->
-            </tbody>
-        </table>
-    </main>
-
-    <!-- Modal para Nueva Alerta -->
+    <!-- Modal -->
     <div id="modal-alerta" class="modal">
         <div class="modal-content">
             <h2>Registrar Nueva Alerta</h2>
             <form id="form-alerta">
-                <div class="form-group" style="position: relative;">
-                    <label>Buscar Estudiante (Nombre o Cédula)</label>
-                    <input type="text" id="search-estudiante" placeholder="Escribe para buscar..." autocomplete="off">
+                <div class="form-group">
+                    <label>Buscar Estudiante</label>
+                    <input type="text" id="search-estudiante" placeholder="Escribe apellido o cédula..." autocomplete="off">
                     <div id="results-box"></div>
                     <input type="hidden" id="estudiante-id">
                 </div>
-
                 <div class="form-group">
                     <label>Motivo</label>
                     <select id="motivo-alerta">
-                        <option value="Bajo Rendimiento Académico">Bajo Rendimiento Académico</option>
+                        <option value="Bajo Rendimiento">Bajo Rendimiento</option>
                         <option value="Problemas Económicos">Problemas Económicos</option>
-                        <option value="Inasistencia Injustificada">Inasistencia Injustificada</option>
-                        <option value="Problemas de Salud">Problemas de Salud</option>
-                        <option value="Otro">Otro...</option>
+                        <option value="Inasistencia">Inasistencia</option>
+                        <option value="Otros">Otros</option>
                     </select>
                 </div>
-
-                <div class="form-group">
-                    <label>Prioridad</label>
-                    <select id="prioridad-alerta">
-                        <option value="Baja">Baja</option>
-                        <option value="Media" selected>Media</option>
-                        <option value="Alta">Alta</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Descripción / Observaciones</label>
-                    <textarea id="descripcion-alerta" rows="3" placeholder="Detalles adicionales..."></textarea>
-                </div>
-
                 <div class="modal-footer">
-                    <button type="button" class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
-                    <button type="submit" class="btn-new">Guardar Alerta</button>
+                    <button type="button" onclick="cerrarModal()" style="padding: 10px 20px; border: none; cursor: pointer;">Cancelar</button>
+                    <button type="submit" class="btn-new">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script src="../../js/auth.js"></script>
-    <script src="js/alertas.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', cargarAlertas);
+
+        function abrirModal() { document.getElementById('modal-alerta').style.display = 'flex'; }
+        function cerrarModal() { document.getElementById('modal-alerta').style.display = 'none'; }
+
+        async function cargarAlertas() {
+            try {
+                const res = await fetch('/bienestar/api/alertas');
+                const data = await res.json();
+                const tbody = document.getElementById('tbody-alertas');
+                tbody.innerHTML = '';
+                
+                if (data.datos && data.datos.length > 0) {
+                    data.datos.forEach(a => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><strong>${a.apellidos} ${a.nombres}</strong></td>
+                            <td>${a.motivo}</td>
+                            <td><span class="badge ${a.estado === 'Pendiente' ? 'status-pend' : 'status-resu'}">${a.estado}</span></td>
+                            <td>${new Date(a.creado_en).toLocaleDateString()}</td>
+                            <td><button onclick="eliminar(${a.id})" style="color: red; border: none; background: none; cursor: pointer;">Eliminar</button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">No hay alertas registradas.</td></tr>';
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // Buscador predictivo
+        const searchInput = document.getElementById('search-estudiante');
+        const resultsBox = document.getElementById('results-box');
+        
+        searchInput.addEventListener('input', async (e) => {
+            const q = e.target.value;
+            if (q.length < 2) { resultsBox.style.display = 'none'; return; }
+            const res = await fetch(`/bienestar/api/estudiantes/buscar?q=${q}`);
+            const data = await res.json();
+            if (data.datos && data.datos.length > 0) {
+                resultsBox.innerHTML = '';
+                data.datos.forEach(est => {
+                    const d = document.createElement('div');
+                    d.className = 'result-item';
+                    d.textContent = `${est.apellidos} ${est.nombres}`;
+                    d.onclick = () => {
+                        searchInput.value = `${est.apellidos} ${est.nombres}`;
+                        document.getElementById('estudiante-id').value = est.id;
+                        resultsBox.style.display = 'none';
+                    };
+                    resultsBox.appendChild(d);
+                });
+                resultsBox.style.display = 'block';
+            }
+        });
+
+        document.getElementById('form-alerta').onsubmit = async (e) => {
+            e.preventDefault();
+            const body = {
+                estudiante_id: document.getElementById('estudiante-id').value,
+                motivo: document.getElementById('motivo-alerta').value
+            };
+            await fetch('/bienestar/api/alertas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            cerrarModal();
+            cargarAlertas();
+        };
+    </script>
 </body>
 </html>
