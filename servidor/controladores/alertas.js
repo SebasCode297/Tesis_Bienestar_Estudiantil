@@ -1,15 +1,22 @@
 // =============================================
 // alertas.js — Controlador de Alertas Tempranas
-// Gestiona el ciclo de vida de los casos estudiantiles
+// Gestiona el ciclo de vida completo de los casos estudiantiles
 // =============================================
 
 const pool = require('../config/baseDatos');
 
-// 1. Obtener todas las alertas con los datos del estudiante
+// 1. Listar todas las alertas con datos del estudiante
 const listar = async (req, res) => {
     try {
         const resultado = await pool.query(`
-            SELECT a.*, e.nombres, e.apellidos, e.cedula
+            SELECT 
+                a.id,
+                a.motivo,
+                a.estado,
+                a.creado_en,
+                e.nombres,
+                e.apellidos,
+                e.cedula
             FROM alertas_tempranas a
             JOIN estudiantes e ON a.estudiante_id = e.id
             ORDER BY a.creado_en DESC
@@ -21,37 +28,43 @@ const listar = async (req, res) => {
     }
 };
 
-// 2. Crear una nueva alerta para un estudiante
+// 2. Crear una nueva alerta
 const crear = async (req, res) => {
     try {
-        const { estudiante_id, motivo, descripcion, prioridad } = req.body;
+        const { estudiante_id, motivo } = req.body;
 
         if (!estudiante_id || !motivo) {
-            return res.status(400).json({ exito: false, mensaje: 'Faltan datos obligatorios' });
+            return res.status(400).json({ exito: false, mensaje: 'Faltan datos: estudiante y motivo son obligatorios' });
         }
 
+        // Inserción simple con solo los campos esenciales
         const resultado = await pool.query(`
-            INSERT INTO alertas_tempranas (estudiante_id, motivo, descripcion, prioridad)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO alertas_tempranas (estudiante_id, motivo)
+            VALUES ($1, $2)
             RETURNING *
-        `, [estudiante_id, motivo, descripcion || '', prioridad || 'Media']);
+        `, [estudiante_id, motivo]);
 
         res.json({ exito: true, mensaje: 'Alerta registrada correctamente', datos: resultado.rows[0] });
     } catch (error) {
-        console.error('Error al crear alerta:', error);
-        res.status(500).json({ exito: false, mensaje: 'Error al registrar alerta' });
+        console.error('Error al crear alerta:', error.message);
+        res.status(500).json({ exito: false, mensaje: 'Error al registrar alerta: ' + error.message });
     }
 };
 
-// 3. Cambiar el estado de una alerta (ej. de Pendiente a Resuelto)
+// 3. Cambiar el estado de una alerta
 const actualizarEstado = async (req, res) => {
     try {
         const { id } = req.params;
         const { estado } = req.body;
 
+        const estadosValidos = ['Pendiente', 'En Proceso', 'Resuelto'];
+        if (!estadosValidos.includes(estado)) {
+            return res.status(400).json({ exito: false, mensaje: 'Estado no válido' });
+        }
+
         const resultado = await pool.query(`
             UPDATE alertas_tempranas 
-            SET estado = $1, actualizado_en = NOW()
+            SET estado = $1
             WHERE id = $2 
             RETURNING *
         `, [estado, id]);
@@ -62,7 +75,7 @@ const actualizarEstado = async (req, res) => {
 
         res.json({ exito: true, mensaje: 'Estado actualizado', datos: resultado.rows[0] });
     } catch (error) {
-        console.error('Error al actualizar alerta:', error);
+        console.error('Error al actualizar alerta:', error.message);
         res.status(500).json({ exito: false, mensaje: 'Error al actualizar estado' });
     }
 };
@@ -72,9 +85,9 @@ const eliminar = async (req, res) => {
     try {
         const { id } = req.params;
         await pool.query('DELETE FROM alertas_tempranas WHERE id = $1', [id]);
-        res.json({ exito: true, mensaje: 'Alerta eliminada' });
+        res.json({ exito: true, mensaje: 'Alerta eliminada correctamente' });
     } catch (error) {
-        console.error('Error al eliminar alerta:', error);
+        console.error('Error al eliminar alerta:', error.message);
         res.status(500).json({ exito: false, mensaje: 'Error al eliminar alerta' });
     }
 };
