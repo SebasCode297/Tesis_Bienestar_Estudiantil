@@ -3,134 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alertas Tempranas | Bienestar Estudiantil</title>
+    <title>Alertas Tempranas | Bienestar ISTPET</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/bienestar/panel/estilos/panel.css">
     <style>
-        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
-        .status-pend { background: #fee2e2; color: #b91c1c; }
-        .status-resu { background: #dcfce7; color: #15803d; }
-        .btn-new { background: var(--primary-color); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: var(--transition); }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 500px; }
-        .form-group { margin-bottom: 20px; position: relative; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; }
-        #results-box { position: absolute; background: white; width: 100%; max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; z-index: 10; display: none; }
-        .result-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
-        .result-item:hover { background: #f8fafc; }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+        .badge-pendiente  { background: #fee2e2; color: #b91c1c; }
+        .badge-en-proceso { background: #fef3c7; color: #b45309; }
+        .badge-resuelto   { background: #dcfce7; color: #15803d; }
+
+        .btn-primary { background: var(--primary-color); color: white; border: none; padding: 12px 28px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
+        .btn-primary:hover { opacity: 0.85; }
+        .btn-danger  { color: #ef4444; border: none; background: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center; }
+        .modal-box { background: white; padding: 35px; border-radius: 20px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+        .modal-box h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 25px; color: var(--primary-color); }
+        .campo { margin-bottom: 20px; }
+        .campo label { display: block; font-weight: 600; margin-bottom: 8px; color: #374151; font-size: 0.9rem; }
+        .campo input, .campo select, .campo textarea { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; outline: none; font-size: 0.9rem; transition: border 0.2s; }
+        .campo input:focus, .campo select:focus { border-color: var(--primary-color); }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px; }
+        .btn-cancelar { padding: 12px 24px; border: 1px solid #e2e8f0; border-radius: 10px; background: white; cursor: pointer; font-weight: 600; color: #64748b; }
+
+        /* Buscador predictivo */
+        .search-wrapper { position: relative; }
+        .resultados-lista { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); z-index: 300; display: none; max-height: 220px; overflow-y: auto; }
+        .resultado-item { padding: 12px 15px; cursor: pointer; font-size: 0.9rem; border-bottom: 1px solid #f1f5f9; }
+        .resultado-item:hover { background: #f8fafc; }
+        .resultado-item strong { display: block; color: #0f172a; }
+        .resultado-item span { color: #64748b; font-size: 0.8rem; }
     </style>
 </head>
 <body>
-    <div class="panel-container">
-        <aside class="sidebar">
-            <div class="sidebar-header"><h2>ISTPET</h2><small>Bienestar Estudiantil</small></div>
-            <nav class="menu-links">
-                <a href="/bienestar/panel" class="menu-item"><span>Inicio / Dashboard</span></a>
-                <a href="/bienestar/estudiantes" class="menu-item"><span>Gestión Estudiantil</span></a>
-                <a href="/bienestar/alertas" class="menu-item active"><span>Alertas Tempranas</span></a>
-                <a href="/bienestar/reportes" class="menu-item"><span>Reportes e Indicadores</span></a>
-                <a href="/bienestar/configuracion" class="menu-item"><span>Configuración Formatos</span></a>
-            </nav>
-            <div class="sidebar-footer" style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
-                <a href="/bienestar/cerrar-sesion" class="menu-item" style="color: #f87171;"><span>Cerrar Sesión</span></a>
-            </div>
-        </aside>
+<div class="panel-container">
 
-        <main class="main-content">
-            <header class="header-top">
-                <div class="welcome-text"><h1>Alertas Tempranas</h1><p>Identificación y seguimiento de casos estudiantiles</p></div>
-                <button class="btn-new" onclick="abrirModal()">Nueva Alerta</button>
-            </header>
-
-            <div class="panel-box">
-                <table>
-                    <thead>
-                        <tr><th>Estudiante</th><th>Motivo</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr>
-                    </thead>
-                    <tbody id="tbody-alertas">
-                        <tr><td colspan="5" style="text-align: center; padding: 20px;">Cargando alertas...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </main>
-    </div>
-
-    <!-- Modal -->
-    <div id="modal-alerta" class="modal">
-        <div class="modal-content">
-            <h2 style="margin-bottom: 20px;">Registrar Nueva Alerta</h2>
-            <form id="form-alerta">
-                <div class="form-group">
-                    <label style="display:block; margin-bottom: 8px;">Buscar Estudiante</label>
-                    <input type="text" id="search-estudiante" placeholder="Escribe apellido o cédula..." autocomplete="off">
-                    <div id="results-box"></div>
-                    <input type="hidden" id="estudiante-id">
-                </div>
-                <div class="form-group">
-                    <label style="display:block; margin-bottom: 8px;">Motivo</label>
-                    <select id="motivo-alerta">
-                        <option value="Bajo Rendimiento">Bajo Rendimiento</option>
-                        <option value="Problemas Económicos">Problemas Económicos</option>
-                        <option value="Inasistencia">Inasistencia</option>
-                        <option value="Otros">Otros</option>
-                    </select>
-                </div>
-                <div style="display:flex; justify-content:flex-end; gap: 10px;">
-                    <button type="button" onclick="cerrarModal()" style="padding: 10px 20px; border:none; cursor:pointer;">Cancelar</button>
-                    <button type="submit" class="btn-new">Guardar</button>
-                </div>
-            </form>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>ISTPET</h2>
+            <small>Bienestar Estudiantil</small>
         </div>
+        <nav class="menu-links">
+            <a href="/bienestar/panel" class="menu-item"><span>Inicio / Dashboard</span></a>
+            <a href="/bienestar/estudiantes" class="menu-item"><span>Gestión Estudiantil</span></a>
+            <a href="/bienestar/alertas" class="menu-item active"><span>Alertas Tempranas</span></a>
+            <a href="/bienestar/reportes" class="menu-item"><span>Reportes e Indicadores</span></a>
+            <a href="/bienestar/configuracion" class="menu-item"><span>Configuración Formatos</span></a>
+        </nav>
+        <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
+            <a href="/bienestar/cerrar-sesion" class="menu-item" style="color: #f87171;"><span>Cerrar Sesión</span></a>
+        </div>
+    </aside>
+
+    <!-- CONTENIDO -->
+    <main class="main-content">
+        <header class="header-top">
+            <div class="welcome-text">
+                <h1>Alertas Tempranas</h1>
+                <p>Identificación y seguimiento de casos estudiantiles</p>
+            </div>
+            <button class="btn-primary" onclick="abrirModal()">Nueva Alerta</button>
+        </header>
+
+        <div class="panel-box">
+            <table style="width:100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Motivo</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-alertas">
+                    <tr><td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">Cargando alertas...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<!-- MODAL NUEVA ALERTA -->
+<div id="modal-alerta" class="modal-overlay">
+    <div class="modal-box">
+        <h2>Registrar Nueva Alerta</h2>
+        <form id="form-alerta">
+            <div class="campo">
+                <label>Buscar Estudiante (por cédula o apellido)</label>
+                <div class="search-wrapper">
+                    <input type="text" id="input-buscar" placeholder="Ej: Pilamunga o 1751889278" autocomplete="off">
+                    <div id="resultados-lista" class="resultados-lista"></div>
+                </div>
+                <input type="hidden" id="estudiante-id-seleccionado">
+            </div>
+            <div class="campo">
+                <label>Motivo de la Alerta</label>
+                <select id="motivo-alerta">
+                    <option value="Bajo Rendimiento">Bajo Rendimiento</option>
+                    <option value="Inasistencia Reiterada">Inasistencia Reiterada</option>
+                    <option value="Problemas Económicos">Problemas Económicos</option>
+                    <option value="Problemas Personales">Problemas Personales</option>
+                    <option value="Riesgo de Deserción">Riesgo de Deserción</option>
+                    <option value="Otros">Otros</option>
+                </select>
+            </div>
+            <div class="campo">
+                <label>Descripción (opcional)</label>
+                <textarea id="descripcion-alerta" rows="3" placeholder="Detalles adicionales del caso..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
+                <button type="submit" class="btn-primary">Guardar Alerta</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', cargarAlertas);
-        function abrirModal() { document.getElementById('modal-alerta').style.display = 'flex'; }
-        function cerrarModal() { document.getElementById('modal-alerta').style.display = 'none'; }
+<script>
+// =============================================
+// MODAL
+// =============================================
+function abrirModal() {
+    document.getElementById('modal-alerta').style.display = 'flex';
+    document.getElementById('input-buscar').value = '';
+    document.getElementById('estudiante-id-seleccionado').value = '';
+    document.getElementById('resultados-lista').style.display = 'none';
+}
+function cerrarModal() {
+    document.getElementById('modal-alerta').style.display = 'none';
+}
 
-        async function cargarAlertas() {
-            try {
-                const res = await fetch('/bienestar/api/alertas');
-                const data = await res.json();
-                const tbody = document.getElementById('tbody-alertas');
-                tbody.innerHTML = '';
-                if (data.datos && data.datos.length > 0) {
-                    data.datos.forEach(a => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `<td><strong>${a.apellidos} ${a.nombres}</strong></td><td>${a.motivo}</td><td><span class="badge ${a.estado === 'Pendiente' ? 'status-pend' : 'status-resu'}">${a.estado}</span></td><td>${new Date(a.creado_en).toLocaleDateString()}</td><td><button onclick="eliminar(${a.id})" style="color: red; border: none; background: none; cursor: pointer;">Eliminar</button></td>`;
-                        tbody.appendChild(tr);
-                    });
-                } else { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">No hay alertas registradas.</td></tr>'; }
-            } catch (e) { console.error(e); }
+// =============================================
+// BUSCADOR PREDICTIVO DE ESTUDIANTES
+// =============================================
+const inputBuscar = document.getElementById('input-buscar');
+const listaResultados = document.getElementById('resultados-lista');
+
+inputBuscar.addEventListener('input', async function() {
+    const q = this.value.trim();
+    if (q.length < 2) { listaResultados.style.display = 'none'; return; }
+
+    try {
+        const res = await fetch(`/bienestar/api/estudiantes/buscar?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+
+        if (data.exito && data.datos.length > 0) {
+            listaResultados.innerHTML = '';
+            data.datos.forEach(est => {
+                const div = document.createElement('div');
+                div.className = 'resultado-item';
+                div.innerHTML = `<strong>${est.apellidos} ${est.nombres}</strong><span>Cédula: ${est.cedula}</span>`;
+                div.onclick = () => {
+                    inputBuscar.value = `${est.apellidos} ${est.nombres}`;
+                    document.getElementById('estudiante-id-seleccionado').value = est.id;
+                    listaResultados.style.display = 'none';
+                };
+                listaResultados.appendChild(div);
+            });
+            listaResultados.style.display = 'block';
+        } else {
+            listaResultados.innerHTML = '<div class="resultado-item"><span>No se encontraron resultados</span></div>';
+            listaResultados.style.display = 'block';
+        }
+    } catch (e) {
+        console.error('Error en búsqueda:', e);
+    }
+});
+
+// Cerrar lista al hacer clic fuera
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-wrapper')) listaResultados.style.display = 'none';
+});
+
+// =============================================
+// GUARDAR ALERTA
+// =============================================
+document.getElementById('form-alerta').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const estudianteId = document.getElementById('estudiante-id-seleccionado').value;
+
+    if (!estudianteId) {
+        alert('Por favor selecciona un estudiante de la lista.');
+        return;
+    }
+
+    const body = {
+        estudiante_id: estudianteId,
+        motivo: document.getElementById('motivo-alerta').value,
+        descripcion: document.getElementById('descripcion-alerta').value,
+        prioridad: 'Media'
+    };
+
+    try {
+        const res = await fetch('/bienestar/api/alertas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (data.exito) {
+            cerrarModal();
+            cargarAlertas();
+        } else {
+            alert('Error al guardar: ' + data.mensaje);
+        }
+    } catch (e) {
+        alert('Error de conexión al guardar la alerta.');
+    }
+});
+
+// =============================================
+// CARGAR LISTA DE ALERTAS
+// =============================================
+async function cargarAlertas() {
+    const tbody = document.getElementById('tbody-alertas');
+    try {
+        const res = await fetch('/bienestar/api/alertas');
+        const data = await res.json();
+
+        if (!data.exito) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#ef4444;">Error al cargar. Recarga la página.</td></tr>';
+            return;
         }
 
-        const searchInput = document.getElementById('search-estudiante');
-        const resultsBox = document.getElementById('results-box');
-        searchInput.addEventListener('input', async (e) => {
-            const q = e.target.value;
-            if (q.length < 2) { resultsBox.style.display = 'none'; return; }
-            const res = await fetch(`/bienestar/api/estudiantes/buscar?q=${q}`);
-            const data = await res.json();
-            if (data.datos && data.datos.length > 0) {
-                resultsBox.innerHTML = '';
-                data.datos.forEach(est => {
-                    const d = document.createElement('div');
-                    d.className = 'result-item';
-                    d.textContent = `${est.apellidos} ${est.nombres}`;
-                    d.onclick = () => { searchInput.value = `${est.apellidos} ${est.nombres}`; document.getElementById('estudiante-id').value = est.id; resultsBox.style.display = 'none'; };
-                    resultsBox.appendChild(d);
-                });
-                resultsBox.style.display = 'block';
-            }
-        });
+        if (data.datos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">No hay alertas registradas aún.</td></tr>';
+            return;
+        }
 
-        document.getElementById('form-alerta').onsubmit = async (e) => {
-            e.preventDefault();
-            const body = { estudiante_id: document.getElementById('estudiante-id').value, motivo: document.getElementById('motivo-alerta').value };
-            await fetch('/bienestar/api/alertas', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-            cerrarModal(); cargarAlertas();
-        };
-    </script>
+        tbody.innerHTML = '';
+        data.datos.forEach(a => {
+            const badgeClass = a.estado === 'Pendiente' ? 'badge-pendiente' : a.estado === 'En Proceso' ? 'badge-en-proceso' : 'badge-resuelto';
+            const fecha = new Date(a.creado_en).toLocaleDateString('es-ES');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${a.apellidos} ${a.nombres}</strong><br><small style="color:#64748b;">${a.cedula}</small></td>
+                <td>${a.motivo}</td>
+                <td><span class="badge ${badgeClass}">${a.estado}</span></td>
+                <td>${fecha}</td>
+                <td>
+                    <select onchange="cambiarEstado(${a.id}, this.value)" style="border:1px solid #e2e8f0; border-radius:6px; padding:4px 8px; font-size:0.8rem;">
+                        <option ${a.estado==='Pendiente'?'selected':''}>Pendiente</option>
+                        <option ${a.estado==='En Proceso'?'selected':''}>En Proceso</option>
+                        <option ${a.estado==='Resuelto'?'selected':''}>Resuelto</option>
+                    </select>
+                    <button class="btn-danger" onclick="eliminarAlerta(${a.id})">Eliminar</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#ef4444;">Error de conexión.</td></tr>';
+    }
+}
+
+async function cambiarEstado(id, nuevoEstado) {
+    await fetch(`/bienestar/api/alertas/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: nuevoEstado })
+    });
+    cargarAlertas();
+}
+
+async function eliminarAlerta(id) {
+    if (!confirm('¿Estás seguro de eliminar esta alerta?')) return;
+    await fetch(`/bienestar/api/alertas/${id}`, { method: 'DELETE' });
+    cargarAlertas();
+}
+
+// Inicializar
+document.addEventListener('DOMContentLoaded', cargarAlertas);
+</script>
 </body>
 </html>

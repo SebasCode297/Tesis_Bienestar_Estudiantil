@@ -4,25 +4,25 @@
 // =============================================
 
 const estudianteModelo = require('../modelos/estudiante');
+const pool = require('../config/baseDatos');
 const xlsx = require('xlsx');
 
-// Descarga un Excel de ejemplo con las columnas obligatorias solicitadas
+// Descarga un Excel de ejemplo con las columnas obligatorias
 const descargarPlantilla = (req, res) => {
     try {
         const infoEjemplo = [
             {
-                'Cédula': '1700000000',
-                'Nombres': 'Juan Pérez',
-                'Apellidos': 'García López',
-                'Teléfono': '0987654321',
-                'Correo Institucional': 'juan.perez@istpet.edu.ec'
+                'Cedula': '1700000000',
+                'Nombres': 'Juan Andres',
+                'Apellidos': 'Garcia Lopez',
+                'Telefono': '0987654321',
+                'Correo Institucional': 'juan.garcia@istpet.edu.ec'
             }
         ];
 
         const hoja = xlsx.utils.json_to_sheet(infoEjemplo);
         const libro = xlsx.utils.book_new();
         xlsx.utils.book_append_sheet(libro, hoja, 'Plantilla_Estudiantes');
-
         const buffer = xlsx.write(libro, { type: 'buffer', bookType: 'xlsx' });
 
         res.setHeader('Content-Disposition', 'attachment; filename="Plantilla_ISTPET.xlsx"');
@@ -30,11 +30,11 @@ const descargarPlantilla = (req, res) => {
         res.send(buffer);
     } catch (error) {
         console.error('Error al generar plantilla:', error);
-        res.status(500).json({ exito: false, mensaje: 'No se pudo generar el archivo de plantilla' });
+        res.status(500).json({ exito: false, mensaje: 'No se pudo generar la plantilla' });
     }
 };
 
-// Carga desde Excel procesando solo los 5 campos requeridos
+// Carga desde Excel procesando los 5 campos requeridos
 const cargarDesdeExcel = async (req, res) => {
     try {
         if (!req.file) {
@@ -52,7 +52,7 @@ const cargarDesdeExcel = async (req, res) => {
         const estudiantesValidos = [];
 
         for (const fila of filas) {
-            // Normalizar claves a minúsculas para lectura flexible (sin importar si el Excel usa mayúsculas o minúsculas)
+            // Normalizar claves para lectura flexible
             const filaLower = {};
             for (const key of Object.keys(fila)) {
                 filaLower[key.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '')] = fila[key];
@@ -66,11 +66,11 @@ const cargarDesdeExcel = async (req, res) => {
 
             if (cedula && nombres && apellidos) {
                 estudiantesValidos.push({
-                    cedula: String(cedula).trim(),
-                    nombres: String(nombres).trim(),
+                    cedula:    String(cedula).trim(),
+                    nombres:   String(nombres).trim(),
                     apellidos: String(apellidos).trim(),
-                    telefono: telefono ? String(telefono).trim() : '',
-                    correo: correo ? String(correo).trim().toLowerCase() : ''
+                    telefono:  telefono ? String(telefono).trim() : '',
+                    correo:    correo ? String(correo).trim().toLowerCase() : ''
                 });
             }
         }
@@ -78,16 +78,6 @@ const cargarDesdeExcel = async (req, res) => {
         if (estudiantesValidos.length === 0) {
             return res.status(400).json({ exito: false, mensaje: 'No se encontraron datos válidos en el archivo' });
         }
-
-        const resultado = await pool.query(
-            `SELECT id, nombres, apellidos, cedula 
-             FROM estudiantes 
-             WHERE cedula LIKE $1 
-             OR apellidos ILIKE $1 
-             OR nombres ILIKE $1 
-             LIMIT 5`,
-            [`%${q}%`]
-        );
 
         const resultados = await estudianteModelo.upsertMasivo(estudiantesValidos);
 
@@ -103,16 +93,44 @@ const cargarDesdeExcel = async (req, res) => {
     }
 };
 
+// Lista todos los estudiantes con búsqueda opcional
 const listar = async (req, res) => {
     try {
         const busqueda = req.query.buscar || '';
         const estudiantes = await estudianteModelo.obtenerTodos(busqueda);
         res.json({ exito: true, datos: estudiantes });
     } catch (error) {
+        console.error('Error al listar:', error);
         res.status(500).json({ exito: false, mensaje: 'Error al obtener lista' });
     }
 };
 
+// Busca estudiantes por cédula o nombre para el buscador predictivo
+const buscar = async (req, res) => {
+    try {
+        const q = req.query.q || '';
+        if (q.length < 2) {
+            return res.json({ exito: true, datos: [] });
+        }
+
+        const resultado = await pool.query(
+            `SELECT id, nombres, apellidos, cedula 
+             FROM estudiantes 
+             WHERE cedula LIKE $1 
+             OR apellidos ILIKE $1 
+             OR nombres ILIKE $1 
+             LIMIT 5`,
+            [`%${q}%`]
+        );
+
+        res.json({ exito: true, datos: resultado.rows });
+    } catch (error) {
+        console.error('Error en búsqueda:', error);
+        res.status(500).json({ exito: false, mensaje: 'Error en búsqueda' });
+    }
+};
+
+// Obtiene el detalle de un estudiante por ID
 const obtenerDetalle = async (req, res) => {
     try {
         const { id } = req.params;
@@ -128,5 +146,6 @@ module.exports = {
     cargarDesdeExcel,
     descargarPlantilla,
     listar,
+    buscar,
     obtenerDetalle
 };

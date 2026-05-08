@@ -1,89 +1,77 @@
-/**
- * =============================================
- * reportes.js — Lógica para el Dashboard Analítico
- * =============================================
- */
+// =============================================
+// reportes.js — Lógica del módulo de Reportes e Indicadores
+// Carga estadísticas desde la API y las muestra en pantalla
+// =============================================
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Verificar sesión (auth.js ya hace esto, pero por si acaso)
-    await cargarEstadisticas();
-});
+document.addEventListener('DOMContentLoaded', cargarReportes);
 
-async function cargarEstadisticas() {
+async function cargarReportes() {
     try {
-        const respuesta = await fetch('/bienestar/api/reportes/estadisticas');
-        const data = await respuesta.json();
+        const res = await fetch('/bienestar/api/reportes/estadisticas');
+        const data = await res.json();
 
-        if (data.exito) {
-            const { totalEstudiantes, totalFormatos, alertas, recientes } = data.datos;
-
-            // 1. Llenar tarjetas superiores
-            document.getElementById('stat-estudiantes').textContent = totalEstudiantes;
-            document.getElementById('stat-alertas').textContent = alertas.total;
-            document.getElementById('stat-resueltas').textContent = alertas.resueltas;
-            document.getElementById('stat-formatos').textContent = totalFormatos;
-
-            // 2. Dibujar Gráfico de Alertas (Chart.js)
-            inicializarGraficoAlertas(alertas);
-
-            // 3. Llenar tabla de actividad reciente
-            llenarTablaRecientes(recientes);
+        if (!data.exito) {
+            console.error('Error en datos:', data.mensaje);
+            return;
         }
-    } catch (error) {
-        console.error('Error al cargar estadísticas:', error);
-    }
-}
 
-function inicializarGraficoAlertas(stats) {
-    const ctx = document.getElementById('chartAlertas').getContext('2d');
-    
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Pendientes', 'En Proceso', 'Resueltas'],
-            datasets: [{
-                data: [stats.pendientes, stats.en_proceso, stats.resueltas],
-                backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
-                hoverOffset: 4,
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 20
+        const d = data.datos;
+
+        // Actualizar tarjetas de estadísticas
+        document.getElementById('stat-estudiantes').innerText = d.totalEstudiantes || 0;
+        document.getElementById('stat-alertas').innerText     = d.alertas ? d.alertas.total : 0;
+        document.getElementById('stat-resueltas').innerText   = d.alertas ? d.alertas.resueltas : 0;
+        document.getElementById('stat-formatos').innerText    = d.totalFormatos || 0;
+
+        // Llenar tabla de casos recientes
+        const tbody = document.getElementById('lista-recientes');
+        if (d.recientes && d.recientes.length > 0) {
+            tbody.innerHTML = '';
+            d.recientes.forEach(caso => {
+                const badgeClass = caso.estado === 'Pendiente' ? 'badge-pend'
+                                 : caso.estado === 'En Proceso' ? 'badge-proc' : 'badge-resu';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${caso.apellidos} ${caso.nombres}</strong></td>
+                    <td>${caso.motivo}</td>
+                    <td><span class="badge ${badgeClass}">${caso.estado}</span></td>
+                    <td>${new Date(caso.creado_en).toLocaleDateString('es-ES')}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } else {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#94a3b8;">No hay casos registrados aún.</td></tr>';
+        }
+
+        // Gráfico de Estado de Gestión
+        const ctx = document.getElementById('chartAlertas');
+        if (ctx && d.alertas) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pendientes', 'En Proceso', 'Resueltos'],
+                    datasets: [{
+                        data: [
+                            d.alertas.pendientes || 0,
+                            d.alertas.en_proceso || 0,
+                            d.alertas.resueltas  || 0
+                        ],
+                        backgroundColor: ['#fee2e2', '#fef3c7', '#dcfce7'],
+                        borderColor:     ['#b91c1c', '#b45309', '#15803d'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
                     }
                 }
-            },
-            cutout: '70%'
+            });
         }
-    });
-}
 
-function llenarTablaRecientes(lista) {
-    const tbody = document.getElementById('lista-recientes');
-    tbody.innerHTML = '';
-
-    if (lista.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No hay alertas recientes</td></tr>';
-        return;
+    } catch (error) {
+        console.error('Error al cargar reportes:', error);
     }
-
-    lista.forEach(alerta => {
-        const fecha = new Date(alerta.creado_en).toLocaleDateString();
-        const badgeClass = alerta.estado === 'Pendiente' ? 'badge-pend' : (alerta.estado === 'En Proceso' ? 'badge-proc' : 'badge-resu');
-        
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><strong>${alerta.apellidos} ${alerta.nombres}</strong></td>
-            <td>${alerta.motivo}</td>
-            <td><span class="badge ${badgeClass}">${alerta.estado}</span></td>
-            <td>${fecha}</td>
-        `;
-        tbody.appendChild(tr);
-    });
 }
