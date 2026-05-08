@@ -1,6 +1,7 @@
 // =============================================
 // alertas.js — Controlador de Alertas Tempranas
-// Gestiona el ciclo de vida completo de los casos estudiantiles
+// Usa los nombres de columna reales de la tabla alertas_tempranas:
+// id, estudiante_id, tipo_riesgo, observacion, estado, fecha_reporte
 // =============================================
 
 const pool = require('../config/baseDatos');
@@ -11,38 +12,38 @@ const listar = async (req, res) => {
         const resultado = await pool.query(`
             SELECT 
                 a.id,
-                a.motivo,
+                a.tipo_riesgo   AS motivo,
+                a.observacion,
                 a.estado,
-                a.creado_en,
+                a.fecha_reporte AS creado_en,
                 e.nombres,
                 e.apellidos,
                 e.cedula
             FROM alertas_tempranas a
             JOIN estudiantes e ON a.estudiante_id = e.id
-            ORDER BY a.creado_en DESC
+            ORDER BY a.fecha_reporte DESC
         `);
         res.json({ exito: true, datos: resultado.rows });
     } catch (error) {
-        console.error('Error al listar alertas:', error);
-        res.status(500).json({ exito: false, mensaje: 'Error al obtener alertas' });
+        console.error('Error al listar alertas:', error.message);
+        res.status(500).json({ exito: false, mensaje: 'Error al obtener alertas: ' + error.message });
     }
 };
 
 // 2. Crear una nueva alerta
 const crear = async (req, res) => {
     try {
-        const { estudiante_id, motivo } = req.body;
+        const { estudiante_id, motivo, descripcion } = req.body;
 
         if (!estudiante_id || !motivo) {
             return res.status(400).json({ exito: false, mensaje: 'Faltan datos: estudiante y motivo son obligatorios' });
         }
 
-        // Inserción simple con solo los campos esenciales
         const resultado = await pool.query(`
-            INSERT INTO alertas_tempranas (estudiante_id, motivo)
-            VALUES ($1, $2)
+            INSERT INTO alertas_tempranas (estudiante_id, tipo_riesgo, observacion)
+            VALUES ($1, $2, $3)
             RETURNING *
-        `, [estudiante_id, motivo]);
+        `, [estudiante_id, motivo, descripcion || '']);
 
         res.json({ exito: true, mensaje: 'Alerta registrada correctamente', datos: resultado.rows[0] });
     } catch (error) {

@@ -6,35 +6,41 @@ const estadisticasGenerales = async (req, res) => {
         const resEst = await pool.query('SELECT COUNT(*) FROM estudiantes');
         const totalEstudiantes = parseInt(resEst.rows[0].count) || 0;
 
-        // 2. Alertas por estado (Con manejo de error si la tabla no existe)
+        // 2. Alertas por estado
         let alertasStats = { total: 0, pendientes: 0, en_proceso: 0, resueltas: 0 };
         try {
             const resAlertas = await pool.query(`
                 SELECT 
                     COUNT(*)::int as total,
-                    COUNT(*) FILTER (WHERE estado = 'Pendiente')::int as pendientes,
+                    COUNT(*) FILTER (WHERE estado = 'Pendiente')::int  as pendientes,
                     COUNT(*) FILTER (WHERE estado = 'En Proceso')::int as en_proceso,
-                    COUNT(*) FILTER (WHERE estado = 'Resuelto')::int as resueltas
+                    COUNT(*) FILTER (WHERE estado = 'Resuelto')::int   as resueltas
                 FROM alertas_tempranas
             `);
             if (resAlertas.rows[0]) alertasStats = resAlertas.rows[0];
         } catch (e) {
-            console.log("Tabla alertas_tempranas no lista aún");
+            console.log("Tabla alertas_tempranas no lista aún:", e.message);
         }
 
-        // 3. Actividad reciente (Con manejo de error)
+        // 3. Actividad reciente
         let recientes = [];
         try {
             const resRecientes = await pool.query(`
-                SELECT a.id, a.motivo, a.estado, a.creado_en, e.nombres, e.apellidos
+                SELECT 
+                    a.id,
+                    a.tipo_riesgo   AS motivo,
+                    a.estado,
+                    a.fecha_reporte AS creado_en,
+                    e.nombres,
+                    e.apellidos
                 FROM alertas_tempranas a
                 JOIN estudiantes e ON a.estudiante_id = e.id
-                ORDER BY a.creado_en DESC
+                ORDER BY a.fecha_reporte DESC
                 LIMIT 5
             `);
             recientes = resRecientes.rows;
         } catch (e) {
-            console.log("No hay alertas para mostrar");
+            console.log("No hay alertas para mostrar:", e.message);
         }
 
         res.json({
