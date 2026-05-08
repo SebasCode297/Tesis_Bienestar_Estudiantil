@@ -3,116 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Estudiantes | ISTPET</title>
+    <title>Gestión de Estudiantes | Bienestar ISTPET</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/bienestar/panel/estilos/panel.css">
     <style>
-        /* Estilos específicos para la tabla de estudiantes */
-        .table-container {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            margin-top: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
+        table { width: 100%; border-collapse: collapse; }
         th {
-            text-align: left;
-            padding: 15px;
-            background: #f8fafc;
-            color: #64748b;
-            font-weight: 600;
+            text-align: left; padding: 14px 16px;
+            background: #f8fafc; color: #64748b;
+            font-weight: 600; font-size: 0.85rem;
             border-bottom: 2px solid #e2e8f0;
         }
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #f1f5f9;
-            color: #1e293b;
-        }
-        tr:hover {
-            background: #f8fafc;
-        }
+        td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; color: #1e293b; font-size: 0.9rem; }
+        tr:hover td { background: #f8fafc; }
         .btn-excel {
-            background: #10b981;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
+            background: #10b981; color: white;
+            padding: 12px 24px; border-radius: 10px;
+            font-weight: 700; font-size: 0.9rem;
+            border: none; cursor: pointer; transition: opacity 0.2s;
         }
-        .btn-excel:hover {
-            background: #059669;
-            transform: translateY(-2px);
+        .btn-excel:hover { opacity: 0.85; }
+        .search-input {
+            padding: 10px 16px; border-radius: 8px;
+            border: 1px solid #e2e8f0; font-size: 0.9rem;
+            width: 260px; outline: none;
+        }
+        .search-input:focus { border-color: var(--primary-color); }
+        .btn-ver {
+            color: #3b82f6; background: none; border: none;
+            cursor: pointer; font-size: 0.85rem; font-weight: 600;
         }
     </style>
 </head>
 <body>
+<div class="panel-container">
 
+    <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sidebar-header">
             <h2>ISTPET</h2>
             <small>Bienestar Estudiantil</small>
         </div>
         <nav class="menu-links">
-            <a href="/bienestar/panel" class="menu-item">
-                <span>Inicio / Dashboard</span>
-            </a>
-            <a href="/bienestar/estudiantes" class="menu-item active">
-                <span>Gestión Estudiantil</span>
-            </a>
-            <a href="/bienestar/alertas" class="menu-item">
-                <span>Alertas Tempranas</span>
-            </a>
-            <a href="/bienestar/reportes" class="menu-item">
-                <span>Reportes e Indicadores</span>
-            </a>
-            <a href="/bienestar/configuracion" class="menu-item">
-                <span>Configuración Formatos</span>
-            </a>
+            <a href="/bienestar/panel"        class="menu-item"><span>Inicio / Dashboard</span></a>
+            <a href="/bienestar/estudiantes"  class="menu-item active"><span>Gestión Estudiantil</span></a>
+            <a href="/bienestar/alertas"      class="menu-item"><span>Alertas Tempranas</span></a>
+            <a href="/bienestar/reportes"     class="menu-item"><span>Reportes e Indicadores</span></a>
+            <a href="/bienestar/configuracion" class="menu-item"><span>Configuración Formatos</span></a>
         </nav>
-        <div style="padding: 20px; margin-top: auto;">
-            <a href="/bienestar/cerrar-sesion" style="display:flex; align-items:center; gap:10px; color:#ef4444; text-decoration:none; font-weight:600; font-size:0.85rem;">
-                Cerrar Sesión
+        <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto;">
+            <a href="/bienestar/cerrar-sesion" class="menu-item" style="color: #f87171;">
+                <span>Cerrar Sesión</span>
             </a>
         </div>
     </aside>
 
+    <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
         <header class="header-top">
             <div class="welcome-text">
                 <h1>Gestión de Estudiantes</h1>
                 <p>Carga y administra la base de datos de alumnos del instituto.</p>
             </div>
-            
-            <div class="actions">
-                <!-- Botón oculto para subir archivo -->
-                <input type="file" id="input-excel" accept=".xlsx, .xls" style="display: none;">
+            <div>
+                <input type="file" id="input-excel" accept=".xlsx,.xls" style="display:none;">
                 <button class="btn-excel" onclick="document.getElementById('input-excel').click()">
-                    <i class="fa-solid fa-file-excel"></i>
                     Importar desde Excel
                 </button>
             </div>
         </header>
 
-        <div class="table-container">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="font-weight: 700; color: #0f172a;">Lista de Alumnos</h3>
-                <div class="search-box" style="position: relative;">
-                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 15px; top: 12px; color: #94a3b8;"></i>
-                    <input type="text" placeholder="Buscar por cédula o nombre..." style="padding: 10px 10px 10px 40px; border-radius: 8px; border: 1px solid #e2e8f0; width: 300px;">
-                </div>
+        <div class="panel-box">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="font-weight:700; color:#0f172a; font-size:1rem;">Lista de Alumnos</h3>
+                <input
+                    type="text"
+                    id="input-buscar"
+                    class="search-input"
+                    placeholder="Buscar por cédula o nombre..."
+                    oninput="filtrarTabla(this.value)"
+                >
             </div>
 
             <table>
@@ -127,18 +98,107 @@
                     </tr>
                 </thead>
                 <tbody id="tabla-estudiantes-body">
-                    <!-- Los datos se cargarán aquí desde la base de datos -->
                     <tr>
-                        <td colspan="6" style="text-align: center; padding: 40px; color: #94a3b8;">
-                            <i class="fa-solid fa-folder-open" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
-                            Aún no hay alumnos registrados. ¡Importa tu primer Excel!
+                        <td colspan="6" style="text-align:center; padding:40px; color:#94a3b8;">
+                            Cargando alumnos...
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </main>
+</div>
 
-    <script src="/bienestar/panel/js/estudiantes.js"></script>
+<script>
+let todosLosEstudiantes = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+    cargarEstudiantes();
+    document.getElementById('input-excel').addEventListener('change', (e) => {
+        if (e.target.files[0]) subirExcel(e.target.files[0]);
+    });
+});
+
+async function cargarEstudiantes() {
+    try {
+        const res  = await fetch('/bienestar/api/estudiantes');
+        const data = await res.json();
+        if (data.exito) {
+            todosLosEstudiantes = data.datos;
+            renderizarTabla(data.datos);
+        } else {
+            mostrarError('Error al cargar: ' + data.mensaje);
+        }
+    } catch (e) {
+        mostrarError('Error de conexión. Recarga la página.');
+    }
+}
+
+function renderizarTabla(estudiantes) {
+    const tbody = document.getElementById('tabla-estudiantes-body');
+    if (!estudiantes.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px; color:#94a3b8;">
+            Aún no hay alumnos registrados. ¡Importa tu primer Excel!
+        </td></tr>`;
+        return;
+    }
+    tbody.innerHTML = estudiantes.map(e => `
+        <tr>
+            <td><strong>${e.cedula}</strong></td>
+            <td>${e.nombres}</td>
+            <td>${e.apellidos}</td>
+            <td>${e.telefono || '—'}</td>
+            <td>${e.correo_institucional || '—'}</td>
+            <td><button class="btn-ver" onclick="verDetalle(${e.id})">Ver</button></td>
+        </tr>
+    `).join('');
+}
+
+function filtrarTabla(texto) {
+    const q = texto.toLowerCase().trim();
+    if (!q) { renderizarTabla(todosLosEstudiantes); return; }
+    const filtrados = todosLosEstudiantes.filter(e =>
+        e.cedula.includes(q) ||
+        e.nombres.toLowerCase().includes(q) ||
+        e.apellidos.toLowerCase().includes(q)
+    );
+    renderizarTabla(filtrados);
+}
+
+function verDetalle(id) {
+    alert('Historial del estudiante — próximamente');
+}
+
+function mostrarError(msg) {
+    document.getElementById('tabla-estudiantes-body').innerHTML =
+        `<tr><td colspan="6" style="text-align:center; padding:30px; color:#ef4444;">${msg}</td></tr>`;
+}
+
+async function subirExcel(archivo) {
+    const btn = document.querySelector('.btn-excel');
+    btn.textContent = 'Procesando...';
+    btn.disabled = true;
+
+    const form = new FormData();
+    form.append('excel', archivo);
+
+    try {
+        const res  = await fetch('/bienestar/api/estudiantes/cargar-excel', { method: 'POST', body: form });
+        const data = await res.json();
+        if (data.exito) {
+            alert('¡Carga exitosa! ' + data.mensaje);
+            cargarEstudiantes();
+        } else {
+            alert('Error: ' + data.mensaje);
+        }
+    } catch (e) {
+        alert('Error de conexión al subir el archivo.');
+    } finally {
+        btn.textContent = 'Importar desde Excel';
+        btn.disabled = false;
+        document.getElementById('input-excel').value = '';
+    }
+}
+</script>
 </body>
 </html>
